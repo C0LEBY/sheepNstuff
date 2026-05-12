@@ -10,6 +10,7 @@ import {
 } from 'recharts'
 import { useFarm } from '../context/FarmContext'
 import { useUser } from '../context/UserContext'
+import { useLanguage } from '../context/LanguageContext'
 import Card, { CardHeader } from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
 import FarmLogo from '../components/ui/FarmLogo'
@@ -104,6 +105,7 @@ export default function Dashboard() {
     stats, healthRecords, breedingRecords, transactions,
   } = useFarm()
   const { activeFarm } = useUser()
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const today = new Date()
 
@@ -212,7 +214,7 @@ export default function Dashboard() {
       {/* ══ 1. Farm header ══════════════════════════════════════ */}
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-stone-400 text-xs uppercase tracking-widest font-medium">Welcome back</p>
+          <p className="text-stone-400 text-xs uppercase tracking-widest font-medium">{t('dash.welcomeBack')}</p>
           <h1 className="text-2xl font-bold text-stone-900 tracking-tight mt-0.5">Groenplaas</h1>
           <p className="flex items-center gap-1 text-xs text-stone-400 mt-1">
             <MapPin size={11} /> North Cape · Season 2025
@@ -226,7 +228,7 @@ export default function Dashboard() {
         <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
         <input
           type="text"
-          placeholder="Search sheep by tag, name or breed…"
+          placeholder={t('dash.searchPlaceholder')}
           value={searchQuery}
           onChange={e => handleSearch(e.target.value)}
           className="w-full pl-10 pr-10 py-3 text-sm bg-white rounded-2xl shadow-card focus:outline-none focus:ring-2 focus:ring-farm-400"
@@ -263,29 +265,29 @@ export default function Dashboard() {
 
       {/* ══ 3. Flock overview ═══════════════════════════════════ */}
       <div>
-        <h2 className="text-base font-semibold text-stone-900 mb-3">Flock Overview</h2>
+        <h2 className="text-base font-semibold text-stone-900 mb-3">{t('dash.flockOverview')}</h2>
         <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <StatPill label="Total"    value={stats.totalSheep}    accent onClick={() => navigate('/sheep')} />
-          <StatPill label="Ewes"     value={stats.ewes}          onClick={() => navigate('/sheep')} />
-          <StatPill label="Rams"     value={stats.rams}          onClick={() => navigate('/sheep')} />
-          <StatPill label="Lambs"    value={stats.lambs}         onClick={() => navigate('/sheep')} />
-          <StatPill label="Pregnant" value={stats.pregnantEwes}  onClick={() => navigate('/breeding')} />
-          <StatPill label="Sick"     value={stats.sickSheep}     onClick={() => navigate('/health')} />
+          <StatPill label={t('label.total')}      value={stats.totalSheep}    accent onClick={() => navigate('/sheep')} />
+          <StatPill label={t('sex.ewes')}         value={stats.ewes}          onClick={() => navigate('/sheep')} />
+          <StatPill label={t('sex.rams')}         value={stats.rams}          onClick={() => navigate('/sheep')} />
+          <StatPill label={t('sex.lambs')}        value={stats.lambs}         onClick={() => navigate('/sheep')} />
+          <StatPill label={t('status.pregnant')}  value={stats.pregnantEwes}  onClick={() => navigate('/breeding')} />
+          <StatPill label={t('status.sick')}      value={stats.sickSheep}     onClick={() => navigate('/health')} />
         </div>
       </div>
 
       {/* ══ 4. Areas ════════════════════════════════════════════ */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-stone-900">Areas & Paddocks</h2>
+          <h2 className="text-base font-semibold text-stone-900">{t('dash.areasAndPaddocks')}</h2>
           <button onClick={() => navigate('/areas')} className="text-xs text-farm-500 font-medium flex items-center gap-1 hover:text-farm-600">
-            Manage <ArrowRight size={12} />
+            {t('action.manage')} <ArrowRight size={12} />
           </button>
         </div>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
           {areaCards.map(area => {
             const capacityColor = area.pct >= 85 ? 'bg-red-400' : area.pct >= 60 ? 'bg-amber-400' : 'bg-farm-400'
-            const capacityLabel = area.pct >= 85 ? 'Almost full' : area.pct >= 60 ? 'Getting full' : null
+            const capacityLabel = area.pct >= 85 ? t('dash.almostFull') : area.pct >= 60 ? t('dash.gettingFull') : null
             return (
               <div
                 key={area.id}
@@ -295,7 +297,7 @@ export default function Dashboard() {
               >
                 <div className="h-full p-4 flex flex-col justify-between">
                   <div>
-                    <p className="text-white/50 text-[10px] uppercase tracking-wider">Area</p>
+                    <p className="text-white/50 text-[10px] uppercase tracking-wider">{t('label.area')}</p>
                     <p className="text-white font-semibold text-sm mt-1 leading-tight">{area.name}</p>
                     <p className="text-white/60 text-xs mt-1.5">{area.count}/{area.capacity}</p>
                     {capacityLabel && (
@@ -325,10 +327,10 @@ export default function Dashboard() {
         {/* Health status */}
         <Card>
           <CardHeader
-            title="Health Status"
+            title={t('dash.healthStatus')}
             action={
               <button onClick={() => navigate('/health')} className="text-xs text-farm-500 font-medium flex items-center gap-1 hover:text-farm-600">
-                View <ArrowRight size={12} />
+                {t('action.view')} <ArrowRight size={12} />
               </button>
             }
           />
@@ -336,7 +338,7 @@ export default function Dashboard() {
           <div className="flex items-end gap-3 mb-4">
             <p className="text-5xl font-bold text-stone-900 leading-none">{healthPct}%</p>
             <div className="mb-1">
-              <p className="text-xs text-stone-400 font-medium">flock healthy</p>
+              <p className="text-xs text-stone-400 font-medium">{t('dash.flockHealthy')}</p>
               <div className="mt-1 w-24 h-1.5 bg-cream-200 rounded-full">
                 <div className="h-1.5 bg-farm-400 rounded-full" style={{ width: `${healthPct}%` }} />
               </div>
@@ -346,10 +348,10 @@ export default function Dashboard() {
           {/* Breakdown */}
           <div className="space-y-2">
             {[
-              { label: 'Healthy',  val: healthCount.healthy,  color: 'bg-farm-400'   },
-              { label: 'Sick',     val: healthCount.sick,     color: 'bg-red-400'    },
-              { label: 'Pregnant', val: healthCount.pregnant, color: 'bg-purple-400' },
-              { label: 'Missing',  val: healthCount.missing,  color: 'bg-amber-400', hide: !healthCount.missing },
+              { label: t('status.healthy'),  val: healthCount.healthy,  color: 'bg-farm-400'   },
+              { label: t('status.sick'),     val: healthCount.sick,     color: 'bg-red-400'    },
+              { label: t('status.pregnant'), val: healthCount.pregnant, color: 'bg-purple-400' },
+              { label: t('status.missing'),  val: healthCount.missing,  color: 'bg-amber-400', hide: !healthCount.missing },
             ].filter(r => !r.hide).map(row => (
               <div key={row.label} className="flex items-center gap-3">
                 <div className={`w-2 h-2 rounded-full flex-shrink-0 ${row.color}`} />
@@ -364,7 +366,7 @@ export default function Dashboard() {
             <div className="mt-4 pt-4 border-t border-cream-100">
               <div className="flex items-center gap-2 text-amber-600">
                 <AlertTriangle size={13} />
-                <p className="text-xs font-semibold">{overdueFollowUps.length} treatment follow-up{overdueFollowUps.length > 1 ? 's' : ''} overdue</p>
+                <p className="text-xs font-semibold">{overdueFollowUps.length} {overdueFollowUps.length > 1 ? t('dash.overdueFollowUps') : t('dash.overdueFollowUp')}</p>
               </div>
             </div>
           )}
@@ -395,11 +397,11 @@ export default function Dashboard() {
         {/* Tasks */}
         <Card>
           <CardHeader
-            title="Tasks & Reminders"
-            subtitle={`${overdueTasks.length} overdue · ${tasks.filter(t => !t.completed).length} open`}
+            title={t('dash.tasksAndReminders')}
+            subtitle={`${overdueTasks.length} ${t('dash.overdue')} · ${tasks.filter(tk => !tk.completed).length} ${t('dash.open')}`}
             action={
               <button onClick={() => navigate('/tasks')} className="text-xs text-farm-500 font-medium flex items-center gap-1 hover:text-farm-600">
-                All <ArrowRight size={12} />
+                {t('label.all')} <ArrowRight size={12} />
               </button>
             }
           />
@@ -412,10 +414,10 @@ export default function Dashboard() {
       {/* ══ 6. Breeding & Lambing ════════════════════════════════ */}
       <Card>
         <CardHeader
-          title="Breeding & Lambing"
+          title={t('dash.breedingAndLambing')}
           action={
             <button onClick={() => navigate('/breeding')} className="text-xs text-farm-500 font-medium flex items-center gap-1 hover:text-farm-600">
-              View all <ArrowRight size={12} />
+              {t('action.viewAll')} <ArrowRight size={12} />
             </button>
           }
         />
@@ -424,10 +426,10 @@ export default function Dashboard() {
           {/* Stats column */}
           <div className="space-y-3">
             {[
-              { label: 'Pregnant Ewes',      val: pregnantEwes.length,  unit: 'ewes' },
-              { label: 'Births This Season',  val: births.length,        unit: 'recorded' },
-              { label: 'Lamb Survival Rate',  val: `${lambSurvivalPct}%`, unit: '' },
-              { label: 'Last Birth',          val: recentBirth ? recentBirth.type : '—', unit: recentBirth ? formatDate(recentBirth.date) : '' },
+              { label: t('dash.pregnantEwes'),     val: pregnantEwes.length,   unit: t('dash.ewes') },
+              { label: t('dash.birthsThisSeason'), val: births.length,          unit: t('dash.recorded') },
+              { label: t('dash.lambSurvivalRate'), val: `${lambSurvivalPct}%`,  unit: '' },
+              { label: t('dash.lastBirth'),        val: recentBirth ? recentBirth.type : '—', unit: recentBirth ? formatDate(recentBirth.date) : '' },
             ].map(row => (
               <div key={row.label} className="flex items-center justify-between py-2 border-b border-cream-100 last:border-0">
                 <p className="text-sm text-stone-500">{row.label}</p>
@@ -440,9 +442,9 @@ export default function Dashboard() {
 
           {/* Upcoming lambings */}
           <div>
-            <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">Upcoming Lambings</p>
+            <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">{t('dash.upcomingLambings')}</p>
             {lambingList.length === 0 ? (
-              <p className="text-sm text-stone-400">No upcoming lambings recorded</p>
+              <p className="text-sm text-stone-400">{t('dash.noUpcomingLambings')}</p>
             ) : (
               <div className="space-y-2.5">
                 {lambingList.slice(0, 4).map(b => (
@@ -477,10 +479,10 @@ export default function Dashboard() {
         {/* Weight insights */}
         <Card>
           <CardHeader
-            title="Weight Insights"
+            title={t('dash.weightAndGrowth')}
             action={
               <button onClick={() => navigate('/reports')} className="text-xs text-farm-500 font-medium flex items-center gap-1 hover:text-farm-600">
-                Reports <ArrowRight size={12} />
+                {t('nav.reports')} <ArrowRight size={12} />
               </button>
             }
           />
@@ -564,11 +566,11 @@ export default function Dashboard() {
       <Card>
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-base font-semibold text-stone-900">Sales & Purchases</h2>
+            <h2 className="text-base font-semibold text-stone-900">{t('page.sales.title')}</h2>
             <p className="text-xs text-stone-400 mt-0.5">{yr} year to date</p>
           </div>
           <button onClick={() => navigate('/sales')} className="text-xs text-farm-500 font-medium flex items-center gap-1 hover:text-farm-600">
-            View all <ArrowRight size={12} />
+            {t('action.viewAll')} <ArrowRight size={12} />
           </button>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">

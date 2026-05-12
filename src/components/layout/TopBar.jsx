@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Menu, Plus, AlertTriangle, Bell, ChevronRight, LogOut, Users, Check } from 'lucide-react'
+import { Menu, AlertTriangle, Bell, ChevronRight, LogOut, Users, Check } from 'lucide-react'
 import { useFarm } from '../../context/FarmContext'
 import { useUser } from '../../context/UserContext'
 import FarmLogo from '../ui/FarmLogo'
@@ -48,15 +48,6 @@ export default function TopBar({ onMenuClick, title }) {
             {overdueTasks.length > 9 ? '9+' : overdueTasks.length}
           </span>
         )}
-      </button>
-
-      {/* Add sheep */}
-      <button
-        onClick={() => navigate('/sheep?add=true')}
-        className="flex items-center gap-1.5 bg-farm-400 hover:bg-farm-500 text-white text-sm font-semibold px-3.5 py-2 rounded-xl transition-colors"
-      >
-        <Plus size={16} />
-        <span className="hidden sm:inline">Add Sheep</span>
       </button>
 
       {/* User avatar */}
@@ -168,14 +159,6 @@ export default function TopBar({ onMenuClick, title }) {
                         {farm.id === activeFarmId && <Check size={15} className="text-farm-500 flex-shrink-0" />}
                       </button>
                     ))}
-                  </div>
-                  <div className="px-4 py-2.5 border-t border-cream-100">
-                    <button
-                      onClick={() => { navigate('/farms'); close() }}
-                      className="text-xs text-farm-600 font-semibold hover:text-farm-700 flex items-center gap-1"
-                    >
-                      <Plus size={12} /> Create new farm
-                    </button>
                   </div>
                 </>
               )}

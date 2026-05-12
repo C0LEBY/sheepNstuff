@@ -4,23 +4,25 @@ import {
   Heart, ShoppingCart, CheckSquare, BarChart3, Settings, X
 } from 'lucide-react'
 import { useUser } from '../../context/UserContext'
+import { useLanguage } from '../../context/LanguageContext'
 import FarmLogo from '../ui/FarmLogo'
 
-const navItems = [
-  { to: '/',          label: 'Dashboard',  icon: LayoutDashboard },
-  { to: '/sheep',     label: 'Sheep',      icon: Tag },
-  { to: '/areas',     label: 'Areas',      icon: MapPin },
-  { to: '/births',    label: 'Births',     icon: Baby },
-  { to: '/health',    label: 'Health',     icon: HeartPulse },
-  { to: '/breeding',  label: 'Breeding',   icon: Heart },
-  { to: '/sales',     label: 'Sales',      icon: ShoppingCart },
-  { to: '/tasks',     label: 'Tasks',      icon: CheckSquare },
-  { to: '/reports',   label: 'Reports',    icon: BarChart3 },
-  { to: '/settings',  label: 'Settings',   icon: Settings },
+const NAV_ITEMS = [
+  { to: '/',          key: 'nav.dashboard', icon: LayoutDashboard },
+  { to: '/sheep',     key: 'nav.sheep',     icon: Tag },
+  { to: '/areas',     key: 'nav.areas',     icon: MapPin },
+  { to: '/births',    key: 'nav.births',    icon: Baby },
+  { to: '/health',    key: 'nav.health',    icon: HeartPulse },
+  { to: '/breeding',  key: 'nav.breeding',  icon: Heart },
+  { to: '/sales',     key: 'nav.sales',     icon: ShoppingCart },
+  { to: '/tasks',     key: 'nav.tasks',     icon: CheckSquare },
+  { to: '/reports',   key: 'nav.reports',   icon: BarChart3 },
+  { to: '/settings',  key: 'nav.settings',  icon: Settings },
 ]
 
 export default function Sidebar({ open, onClose }) {
   const { activeFarm } = useUser()
+  const { t } = useLanguage()
 
   return (
     <>
@@ -52,7 +54,7 @@ export default function Sidebar({ open, onClose }) {
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-4 px-3 scrollbar-thin">
           <div className="space-y-0.5">
-            {navItems.map(({ to, label, icon: Icon }) => (
+            {NAV_ITEMS.map(({ to, key, icon: Icon }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -68,7 +70,7 @@ export default function Sidebar({ open, onClose }) {
                 {({ isActive }) => (
                   <>
                     <Icon size={18} strokeWidth={isActive ? 2.5 : 1.8} />
-                    {label}
+                    {t(key)}
                   </>
                 )}
               </NavLink>

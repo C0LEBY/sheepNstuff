@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { FarmProvider } from './context/FarmContext'
 import { UserProvider } from './context/UserContext'
+import { LanguageProvider } from './context/LanguageContext'
 import Layout from './components/layout/Layout'
 import Dashboard  from './pages/Dashboard'
 import Sheep      from './pages/Sheep'
@@ -17,6 +18,7 @@ import Farms      from './pages/Farms'
 
 export default function App() {
   return (
+    <LanguageProvider>
     <UserProvider>
       <FarmProvider>
         <BrowserRouter>
@@ -39,5 +41,6 @@ export default function App() {
         </BrowserRouter>
       </FarmProvider>
     </UserProvider>
+    </LanguageProvider>
   )
 }

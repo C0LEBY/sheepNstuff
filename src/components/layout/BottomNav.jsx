@@ -1,19 +1,22 @@
 import { NavLink } from 'react-router-dom'
 import { LayoutDashboard, Tag, MapPin, HeartPulse, CheckSquare } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 
-const items = [
-  { to: '/',       label: 'Home',   icon: LayoutDashboard },
-  { to: '/sheep',  label: 'Sheep',  icon: Tag },
-  { to: '/areas',  label: 'Areas',  icon: MapPin },
-  { to: '/health', label: 'Health', icon: HeartPulse },
-  { to: '/tasks',  label: 'Tasks',  icon: CheckSquare },
+const ITEMS = [
+  { to: '/',       key: 'nav.dashboard', icon: LayoutDashboard },
+  { to: '/sheep',  key: 'nav.sheep',     icon: Tag },
+  { to: '/areas',  key: 'nav.areas',     icon: MapPin },
+  { to: '/health', key: 'nav.health',    icon: HeartPulse },
+  { to: '/tasks',  key: 'nav.tasks',     icon: CheckSquare },
 ]
 
 export default function BottomNav() {
+  const { t } = useLanguage()
+
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-cream-200 pb-safe">
       <div className="flex">
-        {items.map(({ to, label, icon: Icon }) => (
+        {ITEMS.map(({ to, key, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
@@ -31,7 +34,7 @@ export default function BottomNav() {
                 ].join(' ')}>
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
                 </div>
-                <span className="text-[10px] font-medium">{label}</span>
+                <span className="text-[10px] font-medium">{t(key)}</span>
               </>
             )}
           </NavLink>
