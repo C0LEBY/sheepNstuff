@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Menu, AlertTriangle, Bell, ChevronRight, LogOut, Users, Check } from 'lucide-react'
 import { useFarm } from '../../context/FarmContext'
 import { useUser } from '../../context/UserContext'
+import { useAuth } from '../../context/AuthContext'
 import FarmLogo from '../ui/FarmLogo'
 
 const AVATAR_COLORS = ['bg-farm-400','bg-blue-400','bg-purple-400','bg-amber-500','bg-pink-400']
@@ -15,6 +16,7 @@ function avatarColor(id = '') {
 export default function TopBar({ onMenuClick, title }) {
   const { tasks } = useFarm()
   const { currentUser, myFarms, activeFarm, activeFarmId, setActiveFarmId } = useUser()
+  const { signOut } = useAuth()
   const navigate = useNavigate()
   const [showProfile, setShowProfile] = useState(false)
   const [showFarmSwitch, setShowFarmSwitch] = useState(false)
@@ -130,7 +132,10 @@ export default function TopBar({ onMenuClick, title }) {
 
                   {/* Sign out */}
                   <div className="px-4 py-2.5 border-t border-cream-100">
-                    <button className="flex items-center gap-2 text-sm text-stone-400 hover:text-stone-600 transition-colors">
+                    <button
+                      onClick={() => { signOut(); navigate('/login') }}
+                      className="flex items-center gap-2 text-sm text-stone-400 hover:text-red-500 transition-colors"
+                    >
                       <LogOut size={14} /> Sign out
                     </button>
                   </div>
