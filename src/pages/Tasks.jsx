@@ -171,7 +171,7 @@ export default function Tasks() {
   const overdue = open.filter(t => t.dueDate && new Date(t.dueDate) < new Date())
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <PageHeader
         title="Tasks & Reminders"
         subtitle={`${open.length} open · ${overdue.length} overdue`}

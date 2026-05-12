@@ -166,7 +166,7 @@ export default function Health() {
   const select = 'text-sm border border-cream-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-farm-400'
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <PageHeader
         title="Health & Treatments"
         subtitle={`${healthRecords.length} records`}

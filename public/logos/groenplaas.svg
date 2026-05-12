@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Outer ring -->
+  <circle cx="100" cy="105" r="72" fill="none" stroke="#1e7a1e" stroke-width="3.5"/>
+
+  <!-- Left wheat branch -->
+  <g fill="#1e7a1e">
+    <!-- stem -->
+    <path d="M38 162 Q28 130 42 95" fill="none" stroke="#1e7a1e" stroke-width="2"/>
+    <!-- leaves (pairs along stem) -->
+    <ellipse cx="26" cy="155" rx="9" ry="3.5" transform="rotate(-40 26 155)"/>
+    <ellipse cx="34" cy="152" rx="9" ry="3.5" transform="rotate(10 34 152)"/>
+    <ellipse cx="23" cy="141" rx="9" ry="3.5" transform="rotate(-30 23 141)"/>
+    <ellipse cx="33" cy="138" rx="9" ry="3.5" transform="rotate(15 33 138)"/>
+    <ellipse cx="24" cy="127" rx="9" ry="3.5" transform="rotate(-20 24 127)"/>
+    <ellipse cx="35" cy="124" rx="9" ry="3.5" transform="rotate(20 35 124)"/>
+    <ellipse cx="28" cy="113" rx="9" ry="3.5" transform="rotate(-12 28 113)"/>
+    <ellipse cx="39" cy="111" rx="9" ry="3.5" transform="rotate(25 39 111)"/>
+    <ellipse cx="34" cy="100" rx="8" ry="3" transform="rotate(-5 34 100)"/>
+    <ellipse cx="44" cy="99" rx="8" ry="3" transform="rotate(28 44 99)"/>
+  </g>
+
+  <!-- Right wheat branch (mirrored) -->
+  <g fill="#1e7a1e">
+    <path d="M162 162 Q172 130 158 95" fill="none" stroke="#1e7a1e" stroke-width="2"/>
+    <ellipse cx="174" cy="155" rx="9" ry="3.5" transform="rotate(40 174 155)"/>
+    <ellipse cx="166" cy="152" rx="9" ry="3.5" transform="rotate(-10 166 152)"/>
+    <ellipse cx="177" cy="141" rx="9" ry="3.5" transform="rotate(30 177 141)"/>
+    <ellipse cx="167" cy="138" rx="9" ry="3.5" transform="rotate(-15 167 138)"/>
+    <ellipse cx="176" cy="127" rx="9" ry="3.5" transform="rotate(20 176 127)"/>
+    <ellipse cx="165" cy="124" rx="9" ry="3.5" transform="rotate(-20 165 124)"/>
+    <ellipse cx="172" cy="113" rx="9" ry="3.5" transform="rotate(12 172 113)"/>
+    <ellipse cx="161" cy="111" rx="9" ry="3.5" transform="rotate(-25 161 111)"/>
+    <ellipse cx="166" cy="100" rx="8" ry="3" transform="rotate(5 166 100)"/>
+    <ellipse cx="156" cy="99" rx="8" ry="3" transform="rotate(-28 156 99)"/>
+  </g>
+
+  <!-- Horizon / ground line -->
+  <path d="M38 128 Q100 118 162 128" fill="none" stroke="#1e7a1e" stroke-width="2.5"/>
+
+  <!-- Field furrow lines -->
+  <path d="M44 138 Q100 130 156 138" fill="none" stroke="#1e7a1e" stroke-width="2"/>
+  <path d="M50 148 Q100 142 150 148" fill="none" stroke="#1e7a1e" stroke-width="2"/>
+  <path d="M57 158 Q100 153 143 158" fill="none" stroke="#1e7a1e" stroke-width="1.5"/>
+
+  <!-- Tractor body -->
+  <g fill="#1e7a1e">
+    <!-- main body -->
+    <rect x="76" y="100" width="36" height="22" rx="2"/>
+    <!-- cab -->
+    <rect x="83" y="88" width="22" height="14" rx="2"/>
+    <!-- exhaust pipe -->
+    <rect x="87" y="82" width="4" height="8" rx="1"/>
+    <!-- exhaust puff -->
+    <circle cx="89" cy="80" r="3"/>
+    <!-- hood / engine cover -->
+    <rect x="112" y="104" width="14" height="10" rx="2"/>
+    <!-- rear big wheel -->
+    <circle cx="84" cy="124" r="12" fill="none" stroke="#1e7a1e" stroke-width="3"/>
+    <circle cx="84" cy="124" r="4"/>
+    <!-- front small wheel -->
+    <circle cx="116" cy="124" r="8" fill="none" stroke="#1e7a1e" stroke-width="2.5"/>
+    <circle cx="116" cy="124" r="3"/>
+    <!-- axle connector -->
+    <rect x="96" y="117" width="12" height="4" rx="1"/>
+  </g>
+
+  <!-- "GROENPLAAS" text arc at bottom -->
+  <path id="bottomArc" d="M 38 162 A 62 62 0 0 0 162 162" fill="none"/>
+  <text font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#1e7a1e" letter-spacing="2.5">
+    <textPath href="#bottomArc" startOffset="10%">GROENPLAAS</textPath>
+  </text>
+</svg>

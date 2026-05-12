@@ -3,6 +3,8 @@ import {
   LayoutDashboard, Tag, MapPin, Baby, HeartPulse,
   Heart, ShoppingCart, CheckSquare, BarChart3, Settings, X
 } from 'lucide-react'
+import { useUser } from '../../context/UserContext'
+import FarmLogo from '../ui/FarmLogo'
 
 const navItems = [
   { to: '/',          label: 'Dashboard',  icon: LayoutDashboard },
@@ -18,6 +20,8 @@ const navItems = [
 ]
 
 export default function Sidebar({ open, onClose }) {
+  const { activeFarm } = useUser()
+
   return (
     <>
       {open && (
@@ -75,10 +79,10 @@ export default function Sidebar({ open, onClose }) {
         {/* Footer */}
         <div className="px-5 py-4 border-t border-cream-200">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 bg-farm-400 rounded-full flex items-center justify-center text-white font-bold text-xs">G</div>
+            <FarmLogo farm={activeFarm} size="sm" />
             <div>
-              <p className="text-sm font-semibold text-stone-800">Groenplaas</p>
-              <p className="text-xs text-stone-400">Season 2025</p>
+              <p className="text-sm font-semibold text-stone-800">{activeFarm?.name}</p>
+              <p className="text-xs text-stone-400">{activeFarm?.season}</p>
             </div>
           </div>
         </div>

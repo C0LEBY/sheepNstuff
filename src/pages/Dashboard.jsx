@@ -1,15 +1,18 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   AlertTriangle, HeartPulse, CheckSquare, Baby, Heart,
   ArrowRight, Scale, TrendingUp, ShoppingCart, Users,
-  MapPin, Leaf, ChevronRight, Activity, Stethoscope,
+  MapPin, Leaf, ChevronRight, Activity, Stethoscope, Search, X,
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts'
 import { useFarm } from '../context/FarmContext'
+import { useUser } from '../context/UserContext'
 import Card, { CardHeader } from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
+import FarmLogo from '../components/ui/FarmLogo'
 import { formatDate, getSheepInArea, monthlyStats } from '../data/mockData'
 
 /* ─── constants ────────────────────────────────────────────────── */
@@ -100,8 +103,30 @@ export default function Dashboard() {
     activeSheep, sheep, areas, births, tasks,
     stats, healthRecords, breedingRecords, transactions,
   } = useFarm()
+  const { activeFarm } = useUser()
   const navigate = useNavigate()
   const today = new Date()
+
+  const [searchQuery, setSearchQuery]   = useState('')
+  const [searchResults, setSearchResults] = useState([])
+
+  function handleSearch(q) {
+    setSearchQuery(q)
+    if (q.length < 1) { setSearchResults([]); return }
+    const lower = q.toLowerCase()
+    setSearchResults(
+      activeSheep.filter(s =>
+        s.tagNumber.toLowerCase().includes(lower) ||
+        (s.name && s.name.toLowerCase().includes(lower)) ||
+        s.breed.toLowerCase().includes(lower)
+      ).slice(0, 6)
+    )
+  }
+
+  function selectSheep(id) {
+    setSearchQuery(''); setSearchResults([])
+    navigate(`/sheep/${id}`)
+  }
 
   /* ── attention ── */
   const overdueTasks     = tasks.filter(t => !t.completed && new Date(t.dueDate) < today)
@@ -193,69 +218,47 @@ export default function Dashboard() {
             <MapPin size={11} /> North Cape · Season 2025
           </p>
         </div>
-        <div className="w-11 h-11 bg-farm-400 rounded-2xl flex items-center justify-center text-white font-bold text-base flex-shrink-0">
-          G
-        </div>
+        <FarmLogo farm={activeFarm} size="md" />
       </div>
 
-      {/* ══ 2. Needs attention ══════════════════════════════════ */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-stone-900">Needs Attention</h2>
-          {overdueTasks.length === 0 && sickSheep.length === 0 && overdueLambings.length === 0 && (
-            <span className="text-xs text-farm-600 font-medium bg-farm-50 px-2.5 py-1 rounded-full">All clear ✓</span>
-          )}
-        </div>
-        <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
-          {overdueLambings.length > 0 && (
-            <AttentionCard
-              count={overdueLambings.length}
-              label="Overdue Lambings"
-              sub={overdueLambings.map(b => b.ewe?.tagNumber || '—').join(', ')}
-              color="red"
-              onClick={() => navigate('/breeding')}
-            />
-          )}
-          {sickSheep.length > 0 && (
-            <AttentionCard
-              count={sickSheep.length}
-              label="Sick Sheep"
-              sub={sickSheep.map(s => s.tagNumber).join(', ')}
-              color="red"
-              onClick={() => navigate('/health')}
-            />
-          )}
-          {overdueFollowUps.length > 0 && (
-            <AttentionCard
-              count={overdueFollowUps.length}
-              label="Treatment Follow-ups"
-              sub="Past due date"
-              color="amber"
-              onClick={() => navigate('/health')}
-            />
-          )}
-          {overdueTasks.length > 0 && (
-            <AttentionCard
-              count={overdueTasks.length}
-              label="Overdue Tasks"
-              sub={`${overdueTasks.filter(t => t.priority === 'high').length} high priority`}
-              color="amber"
-              onClick={() => navigate('/tasks')}
-            />
-          )}
-          {pregnantEwes.length > 0 && (
-            <AttentionCard
-              count={pregnantEwes.length}
-              label="Pregnant Ewes"
-              sub="Monitor closely"
-              color="purple"
-              onClick={() => navigate('/breeding')}
-            />
-          )}
-          {overdueTasks.length === 0 && sickSheep.length === 0 && overdueLambings.length === 0 && (
-            <AttentionCard count={0} label="No urgent issues" sub="Farm is running smoothly" color="green" onClick={() => {}} />
-          )}
-        </div>
+      {/* ══ Search bar ══════════════════════════════════════════ */}
+      <div className="relative">
+        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+        <input
+          type="text"
+          placeholder="Search sheep by tag, name or breed…"
+          value={searchQuery}
+          onChange={e => handleSearch(e.target.value)}
+          className="w-full pl-10 pr-10 py-3 text-sm bg-white rounded-2xl shadow-card focus:outline-none focus:ring-2 focus:ring-farm-400"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => { setSearchQuery(''); setSearchResults([]) }}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+          >
+            <X size={15} />
+          </button>
+        )}
+        {searchResults.length > 0 && (
+          <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-2xl shadow-card-lg border border-cream-200 z-50 overflow-hidden">
+            {searchResults.map(s => (
+              <button
+                key={s.id}
+                onClick={() => selectSheep(s.id)}
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-cream-50 text-left transition-colors border-b border-cream-100 last:border-0"
+              >
+                <div className="w-8 h-8 rounded-full bg-farm-100 flex items-center justify-center text-farm-600 text-xs font-bold flex-shrink-0">
+                  {s.sex === 'ram' ? '♂' : s.sex === 'ewe' ? '♀' : '✦'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-stone-900">{s.tagNumber}{s.name ? ` · ${s.name}` : ''}</p>
+                  <p className="text-xs text-stone-400">{s.breed} · {s.sex}</p>
+                </div>
+                <ChevronRight size={14} className="text-stone-300 flex-shrink-0" />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ══ 3. Flock overview ═══════════════════════════════════ */}

@@ -117,7 +117,7 @@ export default function Sales() {
   const sorted    = filtered.sort((a, b) => new Date(b.date) - new Date(a.date))
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <PageHeader
         title="Sales & Purchases"
         subtitle="Track sheep bought and sold"

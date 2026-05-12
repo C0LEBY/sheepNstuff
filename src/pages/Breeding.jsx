@@ -121,7 +121,7 @@ export default function Breeding() {
   })
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <PageHeader
         title="Breeding"
         subtitle="Track mating, pregnancies, and lambing"

@@ -17,6 +17,7 @@ const PAGE_TITLES = {
   '/tasks':     'Tasks',
   '/reports':   'Reports',
   '/settings':  'Settings',
+  '/farms':     'Farms & Groups',
 }
 
 export default function Layout({ children }) {

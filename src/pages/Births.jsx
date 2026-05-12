@@ -170,7 +170,7 @@ export default function Births() {
   const twinCount   = births.filter(b => b.type === 'twins').length
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <PageHeader
         title="Birth Records"
         subtitle={`${births.length} births recorded`}

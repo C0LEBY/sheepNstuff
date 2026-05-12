@@ -129,7 +129,8 @@ export default function Sheep() {
     return matchSearch && matchSex && matchBreed && matchStatus && matchArea
   })
 
-  const select = 'text-sm border border-cream-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-farm-400'
+  const select        = 'text-sm border border-cream-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-farm-400'
+  const selectMobile = 'w-full text-sm border border-cream-300 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-farm-400'
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -139,8 +140,47 @@ export default function Sheep() {
         action={<Button onClick={() => setAddOpen(true)} icon={<Plus size={16} />}>Add Sheep</Button>}
       />
 
-      {/* Filters */}
-      <Card className="mb-5">
+      {/* Filters — mobile */}
+      <div className="sm:hidden mb-4 space-y-2.5">
+        <div className="relative">
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+          <input
+            placeholder="Search tag, name, breed…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full pl-10 pr-3 py-2.5 text-sm border border-cream-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-farm-400"
+          />
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-0.5 hide-scrollbar">
+          {SEXES.map(s => (
+            <button
+              key={s}
+              onClick={() => setFilterSex(s)}
+              className={[
+                'px-3.5 py-1.5 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-colors',
+                filterSex === s ? 'bg-farm-500 text-white' : 'bg-white text-stone-600 shadow-card',
+              ].join(' ')}
+            >
+              {s === 'All' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1) + 's'}
+            </button>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <select className={selectMobile} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+            {STATUSES.map(s => <option key={s}>{s === 'All' ? 'Any Status' : s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+          </select>
+          <select className={selectMobile} value={filterBreed} onChange={e => setFilterBreed(e.target.value)}>
+            {BREEDS.map(b => <option key={b}>{b === 'All' ? 'Any Breed' : b}</option>)}
+          </select>
+          <select className={`${selectMobile} col-span-2`} value={filterArea} onChange={e => setFilterArea(e.target.value)}>
+            <option value="All">All Areas</option>
+            {areas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+          </select>
+        </div>
+      </div>
+
+      {/* Filters — desktop */}
+      <Card className="hidden sm:block mb-5">
         <div className="flex flex-wrap gap-3">
           <div className="flex-1 min-w-48 relative">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
@@ -224,20 +264,38 @@ export default function Sheep() {
                 <button
                   key={s.id}
                   onClick={() => navigate(`/sheep/${s.id}`)}
-                  className="w-full flex items-center gap-4 px-4 py-3.5 hover:bg-cream-50 text-left"
+                  className="w-full flex items-center gap-3 px-4 py-3.5 active:bg-cream-50 text-left"
                 >
-                  <div className="w-10 h-10 rounded-full bg-farm-100 flex items-center justify-center text-farm-700 font-bold text-xs flex-shrink-0">
-                    {s.tagNumber.slice(0, 4)}
+                  {/* Tag pill */}
+                  <div className="w-12 h-12 rounded-2xl bg-farm-50 border border-farm-100 flex items-center justify-center flex-shrink-0">
+                    <span className="text-farm-700 font-bold text-[11px] leading-tight text-center px-0.5 break-all">
+                      {s.tagNumber}
+                    </span>
                   </div>
+
+                  {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-semibold text-stone-900">{s.tagNumber}</p>
-                      {s.name && <p className="text-stone-500 text-sm truncate">— {s.name}</p>}
+                    <p className="font-semibold text-stone-900 text-sm leading-tight">
+                      {s.name || s.tagNumber}
+                      {s.name && <span className="font-normal text-stone-400 ml-1">#{s.tagNumber}</span>}
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <Badge variant={s.sex} className="!text-[10px] !py-0 !px-1.5">{s.sex}</Badge>
+                      <span className="text-xs text-stone-400">{s.breed}</span>
+                      {area && (
+                        <>
+                          <span className="text-stone-300 text-xs">·</span>
+                          <span className="text-xs text-stone-400 truncate">{area.name}</span>
+                        </>
+                      )}
                     </div>
-                    <p className="text-sm text-stone-500">{s.breed} · {area?.name || '—'}</p>
                   </div>
-                  <Badge variant={s.status}>{s.status}</Badge>
-                  <ChevronRight size={16} className="text-stone-300 flex-shrink-0" />
+
+                  {/* Status + arrow */}
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <Badge variant={s.status}>{s.status}</Badge>
+                    <ChevronRight size={14} className="text-stone-300" />
+                  </div>
                 </button>
               )
             })}
