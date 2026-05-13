@@ -29,6 +29,7 @@ export default function Login() {
   function fillTestUser() {
     setEmail('test@sheeptrack.co.za')
     setPassword('Groenplaas2025')
+    setShowPw(true)
   }
 
   return (
