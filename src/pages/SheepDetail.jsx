@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Scale, HeartPulse, Heart, MoveRight, Edit2 } from 'lucide-react'
+import { ArrowLeft, Scale, HeartPulse, Heart, MoveRight, Edit2, MapPin } from 'lucide-react'
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from 'recharts'
@@ -12,7 +13,10 @@ import Button from '../components/ui/Button'
 export default function SheepDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { sheep, areas, healthRecords, breedingRecords, births, weightHistory } = useFarm()
+  const { sheep, areas, healthRecords, breedingRecords, births, weightHistory, updateSheep } = useFarm()
+  const [changingArea, setChangingArea]   = useState(false)
+  const [selectedAreaId, setSelectedAreaId] = useState('')
+  const [savingArea, setSavingArea]       = useState(false)
 
   const s = sheep.find(x => x.id === id)
 
@@ -32,6 +36,25 @@ export default function SheepDetail() {
   const breeding   = breedingRecords.filter(b => b.ewedId === s.id || b.ramId === s.id)
   const lambBirths = births.filter(b => b.motherId === s.id)
   const wh = weightHistory[s.id] || []
+
+  async function handleAssignArea() {
+    setSavingArea(true)
+    await updateSheep(s.id, { areaId: selectedAreaId || null })
+    setSavingArea(false)
+    setChangingArea(false)
+    setSelectedAreaId('')
+  }
+
+  function openAreaChange() {
+    setSelectedAreaId(s.areaId || '')
+    setChangingArea(true)
+  }
+
+  const areaOccupancy = area
+    ? sheep.filter(x => x.areaId === area.id && x.status !== 'sold' && x.status !== 'dead').length
+    : 0
+
+  const FIELD = 'w-full px-3 py-2 text-sm border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-farm-400 bg-white'
 
   const infoRow = (label, value) => (
     <div key={label} className="flex items-start justify-between py-2.5 border-b border-cream-100 last:border-0">
@@ -111,6 +134,73 @@ export default function SheepDetail() {
                 </div>
               ))}
             </div>
+          </Card>
+
+          {/* Area */}
+          <Card>
+            <CardHeader
+              title="Current Area"
+              icon={<MapPin size={15} />}
+              action={
+                !changingArea && (
+                  <button
+                    onClick={openAreaChange}
+                    className="text-xs text-farm-600 hover:underline font-medium"
+                  >
+                    {area ? 'Change' : 'Assign'}
+                  </button>
+                )
+              }
+            />
+
+            {!changingArea ? (
+              area ? (
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-farm-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <MapPin size={18} className="text-farm-700" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-stone-900">{area.name}</p>
+                    <p className="text-xs text-stone-400 capitalize">{area.type}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-sm font-medium text-stone-700">{areaOccupancy}<span className="text-stone-400">/{area.capacity}</span></p>
+                    <p className="text-xs text-stone-400">sheep</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center py-3 gap-3">
+                  <p className="text-sm text-stone-400">Not assigned to any area</p>
+                  <Button size="sm" variant="outline" icon={<MapPin size={14} />} onClick={openAreaChange}>
+                    Assign Area
+                  </Button>
+                </div>
+              )
+            ) : (
+              <div className="space-y-2.5">
+                <select
+                  className={FIELD}
+                  value={selectedAreaId}
+                  onChange={e => setSelectedAreaId(e.target.value)}
+                >
+                  <option value="">No area (unassign)</option>
+                  {areas.map(a => {
+                    const cnt = sheep.filter(x => x.areaId === a.id && x.status !== 'sold' && x.status !== 'dead').length
+                    return <option key={a.id} value={a.id}>{a.name} ({cnt}/{a.capacity})</option>
+                  })}
+                </select>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="flex-1"
+                    disabled={savingArea} onClick={() => setChangingArea(false)}>
+                    Cancel
+                  </Button>
+                  <Button size="sm" className="flex-1"
+                    disabled={savingArea} onClick={handleAssignArea}>
+                    {savingArea ? 'Saving…' : 'Save'}
+                  </Button>
+                </div>
+              </div>
+            )}
           </Card>
 
           {s.notes && (
