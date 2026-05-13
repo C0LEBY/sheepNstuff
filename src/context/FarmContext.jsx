@@ -39,9 +39,9 @@ export function FarmProvider({ children }) {
     ] = await Promise.all([
       supabase.from('sheep').select('*').eq('farm_id', farmId).order('tag_number'),
       supabase.from('areas').select('*').eq('farm_id', farmId).order('name'),
-      supabase.from('births').select('*').eq('farm_id', farmId).order('birth_date', { ascending: false }),
+      supabase.from('births').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
       supabase.from('health_records').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
-      supabase.from('breeding_records').select('*').eq('farm_id', farmId).order('start_date', { ascending: false }),
+      supabase.from('breeding_records').select('*').eq('farm_id', farmId).order('mating_date', { ascending: false }),
       supabase.from('transactions').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
       supabase.from('tasks').select('*').eq('farm_id', farmId).order('due_date'),
       supabase.from('deaths').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
