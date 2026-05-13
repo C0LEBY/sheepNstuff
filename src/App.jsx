@@ -20,6 +20,7 @@ import Login        from './pages/auth/Login'
 import Register     from './pages/auth/Register'
 import ForgotPassword from './pages/auth/ForgotPassword'
 import ResetPassword  from './pages/auth/ResetPassword'
+import VersionPill  from './components/ui/VersionPill'
 
 /* ── guards ─────────────────────────────────────────────────── */
 function RequireAuth({ children }) {
@@ -44,6 +45,7 @@ export default function App() {
     <LanguageProvider>
       <AuthProvider>
         <BrowserRouter>
+          <VersionPill />
           <Routes>
             {/* Public auth routes */}
             <Route path="/login"          element={<RedirectIfAuthed><Login /></RedirectIfAuthed>} />
