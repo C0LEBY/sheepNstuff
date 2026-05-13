@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Scale, HeartPulse, Heart, MoveRight, Edit2, MapPin } from 'lucide-react'
+import { ArrowLeft, Scale, Edit2, MapPin } from 'lucide-react'
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from 'recharts'
@@ -9,14 +9,27 @@ import { getAge, formatDate } from '../lib/utils'
 import Card, { CardHeader } from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
+import Modal from '../components/ui/Modal'
 
 export default function SheepDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { sheep, areas, healthRecords, breedingRecords, births, weightHistory, updateSheep } = useFarm()
-  const [changingArea, setChangingArea]   = useState(false)
+
+  // Area state
+  const [changingArea, setChangingArea]     = useState(false)
   const [selectedAreaId, setSelectedAreaId] = useState('')
-  const [savingArea, setSavingArea]       = useState(false)
+  const [savingArea, setSavingArea]         = useState(false)
+
+  // Edit modal state
+  const [editOpen, setEditOpen]   = useState(false)
+  const [editForm, setEditForm]   = useState({})
+  const [savingEdit, setSavingEdit] = useState(false)
+
+  // Parents edit state
+  const [editingParents, setEditingParents]   = useState(false)
+  const [parentForm, setParentForm]           = useState({ motherId: '', fatherId: '' })
+  const [savingParents, setSavingParents]     = useState(false)
 
   const s = sheep.find(x => x.id === id)
 
@@ -37,6 +50,50 @@ export default function SheepDetail() {
   const lambBirths = births.filter(b => b.motherId === s.id)
   const wh = weightHistory[s.id] || []
 
+  // ── Edit handlers ─────────────────────────────────────────────
+  function openEdit() {
+    setEditForm({
+      tagNumber:   s.tagNumber,
+      name:        s.name        || '',
+      sex:         s.sex,
+      breed:       s.breed,
+      dateOfBirth: s.dateOfBirth || '',
+      weight:      s.weight      || '',
+      status:      s.status,
+      notes:       s.notes       || '',
+    })
+    setEditOpen(true)
+  }
+
+  async function handleEditSubmit(e) {
+    e.preventDefault()
+    setSavingEdit(true)
+    await updateSheep(s.id, {
+      ...editForm,
+      weight:      parseFloat(editForm.weight) || 0,
+      dateOfBirth: editForm.dateOfBirth || null,
+    })
+    setSavingEdit(false)
+    setEditOpen(false)
+  }
+
+  // ── Parent handlers ───────────────────────────────────────────
+  function openParentEdit() {
+    setParentForm({ motherId: s.motherId || '', fatherId: s.fatherId || '' })
+    setEditingParents(true)
+  }
+
+  async function handleSaveParents() {
+    setSavingParents(true)
+    await updateSheep(s.id, {
+      motherId: parentForm.motherId || null,
+      fatherId: parentForm.fatherId || null,
+    })
+    setSavingParents(false)
+    setEditingParents(false)
+  }
+
+  // ── Area handlers ─────────────────────────────────────────────
   async function handleAssignArea() {
     setSavingArea(true)
     await updateSheep(s.id, { areaId: selectedAreaId || null })
@@ -87,7 +144,7 @@ export default function SheepDetail() {
             </div>
             <p className="text-stone-500 mt-1">{s.breed} · {getAge(s.dateOfBirth)} · {area?.name || 'No area assigned'}</p>
           </div>
-          <Button variant="outline" icon={<Edit2 size={15} />} size="sm">Edit</Button>
+          <Button variant="outline" icon={<Edit2 size={15} />} size="sm" onClick={openEdit}>Edit</Button>
         </div>
       </div>
 
@@ -111,29 +168,74 @@ export default function SheepDetail() {
         {/* Parents */}
         <div className="space-y-4">
           <Card>
-            <CardHeader title="Parents" />
-            <div className="space-y-3">
-              {[{ label: 'Mother', p: mother }, { label: 'Father', p: father }].map(({ label, p }) => (
-                <div key={label} className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-cream-200 flex items-center justify-center text-stone-500 text-xs font-bold flex-shrink-0">
-                    {label[0]}
+            <CardHeader
+              title="Parents"
+              action={
+                !editingParents ? (
+                  <button onClick={openParentEdit} className="text-xs text-farm-600 hover:underline font-medium">
+                    Edit
+                  </button>
+                ) : null
+              }
+            />
+
+            {!editingParents ? (
+              <div className="space-y-3">
+                {[{ label: 'Mother', p: mother }, { label: 'Father', p: father }].map(({ label, p }) => (
+                  <div key={label} className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-cream-200 flex items-center justify-center text-stone-500 text-xs font-bold flex-shrink-0">
+                      {label[0]}
+                    </div>
+                    <div>
+                      <p className="text-xs text-stone-400">{label}</p>
+                      {p ? (
+                        <button
+                          onClick={() => navigate(`/sheep/${p.id}`)}
+                          className="text-sm font-medium text-farm-700 hover:underline"
+                        >
+                          {p.tagNumber}{p.name ? ` — ${p.name}` : ''}
+                        </button>
+                      ) : (
+                        <p className="text-sm text-stone-400">Unknown</p>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs text-stone-400">{label}</p>
-                    {p ? (
-                      <button
-                        onClick={() => navigate(`/sheep/${p.id}`)}
-                        className="text-sm font-medium text-farm-700 hover:underline"
-                      >
-                        {p.tagNumber}{p.name ? ` — ${p.name}` : ''}
-                      </button>
-                    ) : (
-                      <p className="text-sm text-stone-400">Unknown</p>
-                    )}
-                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-stone-500 mb-1">Mother (ewe)</label>
+                  <select className={FIELD} value={parentForm.motherId}
+                    onChange={e => setParentForm(f => ({ ...f, motherId: e.target.value }))}>
+                    <option value="">Unknown / none</option>
+                    {sheep.filter(x => x.id !== s.id && x.sex === 'ewe').map(x => (
+                      <option key={x.id} value={x.id}>{x.tagNumber}{x.name ? ` — ${x.name}` : ''}</option>
+                    ))}
+                  </select>
                 </div>
-              ))}
-            </div>
+                <div>
+                  <label className="block text-xs font-medium text-stone-500 mb-1">Father (ram)</label>
+                  <select className={FIELD} value={parentForm.fatherId}
+                    onChange={e => setParentForm(f => ({ ...f, fatherId: e.target.value }))}>
+                    <option value="">Unknown / none</option>
+                    {sheep.filter(x => x.id !== s.id && x.sex === 'ram').map(x => (
+                      <option key={x.id} value={x.id}>{x.tagNumber}{x.name ? ` — ${x.name}` : ''}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <Button variant="outline" size="sm" className="flex-1"
+                    disabled={savingParents} onClick={() => setEditingParents(false)}>
+                    Cancel
+                  </Button>
+                  <Button size="sm" className="flex-1"
+                    disabled={savingParents} onClick={handleSaveParents}>
+                    {savingParents ? 'Saving…' : 'Save'}
+                  </Button>
+                </div>
+              </div>
+            )}
           </Card>
 
           {/* Area */}
@@ -288,6 +390,82 @@ export default function SheepDetail() {
           )}
         </Card>
       </div>
+
+      {/* ── Edit Sheep Modal ─────────────────────────────── */}
+      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit Sheep" size="lg">
+        <form onSubmit={handleEditSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-stone-500 mb-1">Tag Number *</label>
+              <input required className={FIELD} value={editForm.tagNumber || ''}
+                onChange={e => setEditForm(f => ({ ...f, tagNumber: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-stone-500 mb-1">Name</label>
+              <input className={FIELD} placeholder="Optional" value={editForm.name || ''}
+                onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-stone-500 mb-1">Sex</label>
+              <select className={FIELD} value={editForm.sex || 'ewe'}
+                onChange={e => setEditForm(f => ({ ...f, sex: e.target.value }))}>
+                {['ewe','ram','lamb','wether'].map(v => (
+                  <option key={v} value={v}>{v.charAt(0).toUpperCase() + v.slice(1)}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-stone-500 mb-1">Breed</label>
+              <select className={FIELD} value={editForm.breed || 'Merino'}
+                onChange={e => setEditForm(f => ({ ...f, breed: e.target.value }))}>
+                {['Merino','Dorper','Dohne','Suffolk','Damara'].map(v => (
+                  <option key={v} value={v}>{v}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-stone-500 mb-1">Date of Birth</label>
+              <input type="date" className={FIELD} value={editForm.dateOfBirth || ''}
+                onChange={e => setEditForm(f => ({ ...f, dateOfBirth: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-stone-500 mb-1">Weight (kg)</label>
+              <input type="number" step="0.1" min="0" className={FIELD} value={editForm.weight || ''}
+                onChange={e => setEditForm(f => ({ ...f, weight: e.target.value }))} />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-stone-500 mb-1">Status</label>
+            <select className={FIELD} value={editForm.status || 'healthy'}
+              onChange={e => setEditForm(f => ({ ...f, status: e.target.value }))}>
+              {['healthy','sick','pregnant','sold','dead','missing'].map(v => (
+                <option key={v} value={v}>{v.charAt(0).toUpperCase() + v.slice(1)}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-stone-500 mb-1">Notes</label>
+            <textarea rows={2} className={FIELD} placeholder="Any notes…" value={editForm.notes || ''}
+              onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} />
+          </div>
+
+          <div className="flex gap-3 pt-1">
+            <Button variant="outline" className="flex-1" disabled={savingEdit}
+              onClick={() => setEditOpen(false)}>Cancel</Button>
+            <Button type="submit" className="flex-1" disabled={savingEdit}>
+              {savingEdit ? 'Saving…' : 'Save Changes'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }
