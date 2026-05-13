@@ -182,16 +182,16 @@ alter table deaths          enable row level security;
 -- profiles: own row
 create policy "own profile" on profiles for all using (auth.uid() = id);
 
--- farms: member
+-- farms: use SECURITY DEFINER function to avoid recursive RLS
 create policy "farm member access" on farms for all
-  using (id in (select farm_id from farm_members where user_id = auth.uid()));
+  using (is_farm_member(id));
 
 create policy "farm member insert" on farms for insert
   with check (true);
 
--- farm_members: farm member
+-- farm_members: use SECURITY DEFINER function to avoid infinite recursion
 create policy "farm members access" on farm_members for all
-  using (farm_id in (select farm_id from farm_members where user_id = auth.uid()));
+  using (user_id = auth.uid() or is_farm_member(farm_id));
 
 create policy "farm members insert" on farm_members for insert
   with check (true);
