@@ -24,9 +24,20 @@ function AddSheepModal({ open, onClose }) {
 
   function set(key, val) { setForm(f => ({ ...f, [key]: val })) }
 
-  function handleSubmit(e) {
+  const [saving, setSaving] = useState(false)
+
+  async function handleSubmit(e) {
     e.preventDefault()
-    addSheep({ ...form, weight: parseFloat(form.weight) || 0 })
+    setSaving(true)
+    await addSheep({
+      ...form,
+      weight:      parseFloat(form.weight) || 0,
+      dateOfBirth: form.dateOfBirth || null,
+      areaId:      form.areaId     || null,
+      motherId:    form.motherId   || null,
+      fatherId:    form.fatherId   || null,
+    })
+    setSaving(false)
     onClose()
     setForm({ tagNumber: '', name: '', sex: 'ewe', breed: 'Merino', dateOfBirth: '', areaId: areas[0]?.id || '', status: 'healthy', notes: '', weight: '', motherId: '', fatherId: '' })
   }
@@ -95,8 +106,8 @@ function AddSheepModal({ open, onClose }) {
         </div>
 
         <div className="flex justify-end gap-3 pt-2">
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button type="submit">Save Sheep</Button>
+          <Button variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
+          <Button type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save Sheep'}</Button>
         </div>
       </form>
     </Modal>
