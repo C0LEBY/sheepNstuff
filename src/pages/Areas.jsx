@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { MapPin, Users, AlertTriangle, MoveRight, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useFarm } from '../context/FarmContext'
-import { getSheepInArea } from '../data/mockData'
 import Card, { CardHeader } from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
@@ -70,9 +69,10 @@ function MoveSheepModal({ open, onClose, sourceAreaId }) {
             className="w-full px-3 py-2.5 text-sm border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-farm-400"
           >
             <option value="">Select an area…</option>
-            {targetAreas.map(a => (
-              <option key={a.id} value={a.id}>{a.name} ({getSheepInArea(a.id).length}/{a.capacity})</option>
-            ))}
+            {targetAreas.map(a => {
+                const cnt = sheep.filter(s => s.areaId === a.id && s.status !== 'sold' && s.status !== 'dead').length
+                return <option key={a.id} value={a.id}>{a.name} ({cnt}/{a.capacity})</option>
+              })}
           </select>
         </div>
 
@@ -169,7 +169,7 @@ function AreaCard({ area, onMove }) {
 }
 
 export default function Areas() {
-  const { areas } = useFarm()
+  const { areas, sheep } = useFarm()
   const [moveAreaId, setMoveAreaId] = useState(null)
 
   return (
@@ -186,8 +186,8 @@ export default function Areas() {
           { label: 'Pastures',    value: areas.filter(a => a.type === 'pasture').length },
           { label: 'Pens / Camps', value: areas.filter(a => a.type !== 'pasture').length },
           { label: 'Near Capacity', value: areas.filter(a => {
-            const c = getSheepInArea(a.id).length
-            return c / a.capacity >= 0.9
+            const c = sheep.filter(s => s.areaId === a.id && s.status !== 'sold' && s.status !== 'dead').length
+            return c / Math.max(a.capacity, 1) >= 0.9
           }).length },
         ].map(s => (
           <div key={s.label} className="bg-white rounded-2xl shadow-card p-4 text-center">

@@ -1,100 +1,221 @@
-import { createContext, useContext, useState } from 'react'
-import {
-  sheep as initialSheep,
-  areas as initialAreas,
-  births as initialBirths,
-  healthRecords as initialHealth,
-  breedingRecords as initialBreeding,
-  transactions as initialTransactions,
-  tasks as initialTasks,
-  deaths as initialDeaths,
-  weightHistory as initialWeightHistory,
-} from '../data/mockData'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { supabase, mapRow, mapRows, toDb } from '../lib/supabase'
+import { useUser } from './UserContext'
 
 const FarmContext = createContext(null)
 
 export function FarmProvider({ children }) {
-  const [sheep, setSheep]                   = useState(initialSheep)
-  const [areas]                             = useState(initialAreas)
-  const [births, setBirths]                 = useState(initialBirths)
-  const [healthRecords, setHealthRecords]   = useState(initialHealth)
-  const [breedingRecords, setBreedingRecords] = useState(initialBreeding)
-  const [transactions, setTransactions]     = useState(initialTransactions)
-  const [tasks, setTasks]                   = useState(initialTasks)
-  const [deaths]                            = useState(initialDeaths)
-  const [weightHistory]                     = useState(initialWeightHistory)
-  const [toast, setToast]                   = useState(null)
+  const { activeFarmId } = useUser()
 
+  const [sheep,           setSheep]           = useState([])
+  const [areas,           setAreas]           = useState([])
+  const [births,          setBirths]          = useState([])
+  const [healthRecords,   setHealthRecords]   = useState([])
+  const [breedingRecords, setBreedingRecords] = useState([])
+  const [transactions,    setTransactions]    = useState([])
+  const [tasks,           setTasks]           = useState([])
+  const [deaths,          setDeaths]          = useState([])
+  const [loading,         setLoading]         = useState(false)
+  const [toast,           setToast]           = useState(null)
+
+  /* ── load all farm data when active farm changes ─────────── */
+  const loadFarmData = useCallback(async (farmId) => {
+    if (!farmId) {
+      setSheep([]); setAreas([]); setBirths([])
+      setHealthRecords([]); setBreedingRecords([])
+      setTransactions([]); setTasks([]); setDeaths([])
+      return
+    }
+    setLoading(true)
+    const [
+      { data: sheepRows },
+      { data: areaRows },
+      { data: birthRows },
+      { data: healthRows },
+      { data: breedingRows },
+      { data: txRows },
+      { data: taskRows },
+      { data: deathRows },
+    ] = await Promise.all([
+      supabase.from('sheep').select('*').eq('farm_id', farmId).order('tag_number'),
+      supabase.from('areas').select('*').eq('farm_id', farmId).order('name'),
+      supabase.from('births').select('*').eq('farm_id', farmId).order('birth_date', { ascending: false }),
+      supabase.from('health_records').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
+      supabase.from('breeding_records').select('*').eq('farm_id', farmId).order('start_date', { ascending: false }),
+      supabase.from('transactions').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
+      supabase.from('tasks').select('*').eq('farm_id', farmId).order('due_date'),
+      supabase.from('deaths').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
+    ])
+    setSheep(mapRows(sheepRows))
+    setAreas(mapRows(areaRows))
+    setBirths(mapRows(birthRows))
+    setHealthRecords(mapRows(healthRows))
+    setBreedingRecords(mapRows(breedingRows))
+    setTransactions(mapRows(txRows))
+    setTasks(mapRows(taskRows))
+    setDeaths(mapRows(deathRows))
+    setLoading(false)
+  }, [])
+
+  useEffect(() => {
+    loadFarmData(activeFarmId)
+  }, [activeFarmId, loadFarmData])
+
+  /* ── toast helper ─────────────────────────────────────────── */
   function showToast(message, type = 'success') {
     setToast({ message, type })
     setTimeout(() => setToast(null), 3000)
   }
 
-  function addSheep(sheepData) {
-    const newSheep = { ...sheepData, id: `SH${String(sheep.length + 100).padStart(3,'0')}` }
+  /* ── sheep CRUD ───────────────────────────────────────────── */
+  async function addSheep(sheepData) {
+    const { data, error } = await supabase
+      .from('sheep')
+      .insert({ ...toDb(sheepData), farm_id: activeFarmId })
+      .select().single()
+    if (error) { showToast('Failed to add sheep', 'error'); return null }
+    const newSheep = mapRow(data)
     setSheep(prev => [newSheep, ...prev])
     showToast(`${sheepData.tagNumber} added successfully`)
     return newSheep.id
   }
 
-  function updateSheep(id, updates) {
+  async function updateSheep(id, updates) {
+    const { error } = await supabase.from('sheep').update(toDb(updates)).eq('id', id)
+    if (error) { showToast('Failed to update sheep', 'error'); return }
     setSheep(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s))
     showToast('Sheep record updated')
   }
 
-  function addBirth(birthData) {
-    const id = `birth-${births.length + 1}`
-    setBirths(prev => [{ ...birthData, id }, ...prev])
+  async function deleteSheep(id) {
+    await supabase.from('sheep').delete().eq('id', id)
+    setSheep(prev => prev.filter(s => s.id !== id))
+    showToast('Sheep removed')
+  }
+
+  /* ── areas CRUD ───────────────────────────────────────────── */
+  async function addArea(areaData) {
+    const { data, error } = await supabase
+      .from('areas')
+      .insert({ ...toDb(areaData), farm_id: activeFarmId })
+      .select().single()
+    if (error) { showToast('Failed to add area', 'error'); return null }
+    const newArea = mapRow(data)
+    setAreas(prev => [...prev, newArea].sort((a, b) => a.name.localeCompare(b.name)))
+    showToast(`${areaData.name} added`)
+    return newArea
+  }
+
+  async function updateArea(id, updates) {
+    await supabase.from('areas').update(toDb(updates)).eq('id', id)
+    setAreas(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a))
+    showToast('Area updated')
+  }
+
+  async function deleteArea(id) {
+    await supabase.from('areas').delete().eq('id', id)
+    setAreas(prev => prev.filter(a => a.id !== id))
+    showToast('Area deleted')
+  }
+
+  /* ── births ───────────────────────────────────────────────── */
+  async function addBirth(birthData) {
+    const { data, error } = await supabase
+      .from('births')
+      .insert({ ...toDb(birthData), farm_id: activeFarmId })
+      .select().single()
+    if (error) { showToast('Failed to record birth', 'error'); return }
+    setBirths(prev => [mapRow(data), ...prev])
     showToast('Birth recorded successfully')
   }
 
-  function addHealthRecord(record) {
-    const id = `hr-${healthRecords.length + 1}`
-    setHealthRecords(prev => [{ ...record, id }, ...prev])
+  /* ── health records ───────────────────────────────────────── */
+  async function addHealthRecord(record) {
+    const { data, error } = await supabase
+      .from('health_records')
+      .insert({ ...toDb(record), farm_id: activeFarmId })
+      .select().single()
+    if (error) { showToast('Failed to record treatment', 'error'); return }
+    setHealthRecords(prev => [mapRow(data), ...prev])
     showToast('Treatment recorded')
   }
 
-  function addBreedingRecord(record) {
-    const id = `br-${breedingRecords.length + 1}`
-    setBreedingRecords(prev => [{ ...record, id }, ...prev])
+  /* ── breeding records ─────────────────────────────────────── */
+  async function addBreedingRecord(record) {
+    const { data, error } = await supabase
+      .from('breeding_records')
+      .insert({ ...toDb(record), farm_id: activeFarmId })
+      .select().single()
+    if (error) { showToast('Failed to add breeding record', 'error'); return }
+    setBreedingRecords(prev => [mapRow(data), ...prev])
     showToast('Breeding record added')
   }
 
-  function addTransaction(tx) {
-    const id = `tx-${transactions.length + 1}`
-    setTransactions(prev => [{ ...tx, id }, ...prev])
+  /* ── transactions ─────────────────────────────────────────── */
+  async function addTransaction(tx) {
+    const { data, error } = await supabase
+      .from('transactions')
+      .insert({ ...toDb(tx), farm_id: activeFarmId })
+      .select().single()
+    if (error) { showToast('Failed to record transaction', 'error'); return }
+    setTransactions(prev => [mapRow(data), ...prev])
     showToast(tx.type === 'sale' ? 'Sale recorded' : 'Purchase recorded')
   }
 
-  function toggleTask(id) {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t))
-  }
-
-  function addTask(taskData) {
-    const id = `task-${tasks.length + 1}`
-    setTasks(prev => [{ ...taskData, id, completed: false }, ...prev])
+  /* ── tasks ────────────────────────────────────────────────── */
+  async function addTask(taskData) {
+    const { data, error } = await supabase
+      .from('tasks')
+      .insert({ ...toDb(taskData), farm_id: activeFarmId, completed: false })
+      .select().single()
+    if (error) { showToast('Failed to add task', 'error'); return }
+    setTasks(prev => [mapRow(data), ...prev])
     showToast('Task added')
   }
 
+  async function toggleTask(id) {
+    const task = tasks.find(t => t.id === id)
+    if (!task) return
+    const newVal = !task.completed
+    await supabase.from('tasks').update({ completed: newVal }).eq('id', id)
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: newVal } : t))
+  }
+
+  async function deleteTask(id) {
+    await supabase.from('tasks').delete().eq('id', id)
+    setTasks(prev => prev.filter(t => t.id !== id))
+    showToast('Task deleted')
+  }
+
+  /* ── derived ──────────────────────────────────────────────── */
   const activeSheep = sheep.filter(s => s.status !== 'sold' && s.status !== 'dead')
 
   const stats = {
-    totalSheep: activeSheep.length,
-    pregnantEwes: activeSheep.filter(s => s.status === 'pregnant').length,
-    sickSheep: activeSheep.filter(s => s.status === 'sick').length,
-    rams: activeSheep.filter(s => s.sex === 'ram').length,
-    ewes: activeSheep.filter(s => s.sex === 'ewe').length,
-    lambs: activeSheep.filter(s => s.sex === 'lamb').length,
-    wethers: activeSheep.filter(s => s.sex === 'wether').length,
+    totalSheep:    activeSheep.length,
+    pregnantEwes:  activeSheep.filter(s => s.status === 'pregnant').length,
+    sickSheep:     activeSheep.filter(s => s.status === 'sick').length,
+    rams:          activeSheep.filter(s => s.sex === 'ram').length,
+    ewes:          activeSheep.filter(s => s.sex === 'ewe').length,
+    lambs:         activeSheep.filter(s => s.sex === 'lamb').length,
+    wethers:       activeSheep.filter(s => s.sex === 'wether').length,
   }
+
+  /* weightHistory is not stored in DB yet — return empty map */
+  const weightHistory = {}
 
   return (
     <FarmContext.Provider value={{
       sheep, activeSheep, areas, births, healthRecords,
-      breedingRecords, transactions, tasks, deaths, weightHistory,
-      stats, toast,
-      addSheep, updateSheep, addBirth, addHealthRecord,
-      addBreedingRecord, addTransaction, toggleTask, addTask,
+      breedingRecords, transactions, tasks, deaths,
+      weightHistory, stats, loading, toast,
+      addSheep, updateSheep, deleteSheep,
+      addArea, updateArea, deleteArea,
+      addBirth,
+      addHealthRecord,
+      addBreedingRecord,
+      addTransaction,
+      addTask, toggleTask, deleteTask,
+      refreshFarmData: () => loadFarmData(activeFarmId),
     }}>
       {children}
     </FarmContext.Provider>

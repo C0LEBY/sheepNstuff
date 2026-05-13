@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Plus, ShoppingCart, TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
 import { useFarm } from '../context/FarmContext'
-import { formatDate } from '../data/mockData'
+import { formatDate } from '../lib/utils'
 import Card, { CardHeader } from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'

@@ -1,7 +1,7 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Tag, MapPin, Baby, HeartPulse,
-  Heart, ShoppingCart, CheckSquare, BarChart3, Settings, X
+  Heart, ShoppingCart, CheckSquare, BarChart3, Settings, X, Plus
 } from 'lucide-react'
 import { useUser } from '../../context/UserContext'
 import { useLanguage } from '../../context/LanguageContext'
@@ -23,6 +23,7 @@ const NAV_ITEMS = [
 export default function Sidebar({ open, onClose }) {
   const { activeFarm } = useUser()
   const { t } = useLanguage()
+  const navigate = useNavigate()
 
   return (
     <>
@@ -80,13 +81,26 @@ export default function Sidebar({ open, onClose }) {
 
         {/* Footer */}
         <div className="px-5 py-4 border-t border-cream-200">
-          <div className="flex items-center gap-2.5">
-            <FarmLogo farm={activeFarm} size="sm" />
-            <div>
-              <p className="text-sm font-semibold text-stone-800">{activeFarm?.name}</p>
-              <p className="text-xs text-stone-400">{activeFarm?.season}</p>
-            </div>
-          </div>
+          {activeFarm ? (
+            <button
+              onClick={() => { navigate('/farms'); onClose() }}
+              className="flex items-center gap-2.5 w-full text-left hover:opacity-80 transition-opacity"
+            >
+              <FarmLogo farm={activeFarm} size="sm" />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-stone-800 truncate">{activeFarm.name}</p>
+                <p className="text-xs text-stone-400">{activeFarm.season}</p>
+              </div>
+            </button>
+          ) : (
+            <button
+              onClick={() => { navigate('/farms'); onClose() }}
+              className="flex items-center gap-2 text-sm text-farm-600 font-medium hover:text-farm-700 transition-colors"
+            >
+              <Plus size={15} />
+              Create your first farm
+            </button>
+          )}
         </div>
       </aside>
     </>

@@ -1,5 +1,4 @@
 import { useFarm } from '../context/FarmContext'
-import { getSheepInArea, monthlyStats, formatDate } from '../data/mockData'
 import Card, { CardHeader } from '../components/ui/Card'
 import PageHeader from '../components/ui/PageHeader'
 import Badge from '../components/ui/Badge'
@@ -10,8 +9,10 @@ import {
 
 const COLORS = ['#4A8F6C', '#84BFA2', '#D97706', '#9333ea', '#3b82f6', '#ef4444']
 
+const MONTH_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
 export default function Reports() {
-  const { sheep, areas, births, transactions, healthRecords, breedingRecords } = useFarm()
+  const { sheep, areas, births, deaths, transactions, healthRecords, breedingRecords } = useFarm()
 
   // Sheep by sex
   const bySex = ['ewe', 'ram', 'lamb', 'wether'].map(sex => ({
@@ -28,12 +29,12 @@ export default function Reports() {
 
   // Area occupancy
   const areaOccupancy = areas.map(a => {
-    const count = getSheepInArea(a.id).length
+    const count = sheep.filter(s => s.areaId === a.id && s.status !== 'sold' && s.status !== 'dead').length
     return {
       name: a.name.replace(' Paddock', '').replace(' Pen', '').replace(' Camp', ''),
       sheep: count,
       capacity: a.capacity,
-      pct: Math.round((count / a.capacity) * 100),
+      pct: Math.round((count / Math.max(a.capacity, 1)) * 100),
     }
   })
 
@@ -57,6 +58,24 @@ export default function Reports() {
   const breedSuccessRate = breedingRecords.length > 0
     ? Math.round((breedingRecords.filter(b => b.status === 'lambed').length / breedingRecords.length) * 100)
     : 0
+
+  // Monthly births/deaths/sales chart data
+  const today = new Date()
+  const monthlyStats = MONTH_LABELS.map((month, i) => ({
+    month,
+    births:    births.filter(b => new Date(b.birthDate || b.date).getMonth() === i).length,
+    deaths:    deaths.filter(d => new Date(d.date).getMonth() === i).length,
+    sales:     transactions.filter(t => t.type === 'sale'     && new Date(t.date).getMonth() === i).length,
+    purchases: transactions.filter(t => t.type === 'purchase' && new Date(t.date).getMonth() === i).length,
+  })).filter((_, i) => {
+    const diff = (today.getMonth() - i + 12) % 12
+    return diff < 10
+  }).sort((a, b) => {
+    const ai = MONTH_LABELS.indexOf(a.month)
+    const bi = MONTH_LABELS.indexOf(b.month)
+    const nowM = today.getMonth()
+    return ((ai - nowM + 12 - 9) % 12) - ((bi - nowM + 12 - 9) % 12)
+  })
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload?.length) {

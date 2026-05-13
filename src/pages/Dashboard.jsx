@@ -14,7 +14,10 @@ import { useLanguage } from '../context/LanguageContext'
 import Card, { CardHeader } from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
 import FarmLogo from '../components/ui/FarmLogo'
-import { formatDate, getSheepInArea, monthlyStats } from '../data/mockData'
+function formatDate(dateStr) {
+  if (!dateStr) return '—'
+  return new Date(dateStr).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })
+}
 
 /* ─── constants ────────────────────────────────────────────────── */
 const AREA_GRADIENTS = [
@@ -101,7 +104,7 @@ function TaskRow({ task }) {
 /* ─── main component ───────────────────────────────────────────── */
 export default function Dashboard() {
   const {
-    activeSheep, sheep, areas, births, tasks,
+    activeSheep, sheep, areas, births, deaths, tasks,
     stats, healthRecords, breedingRecords, transactions,
   } = useFarm()
   const { activeFarm } = useUser()
@@ -166,7 +169,7 @@ export default function Dashboard() {
     .filter(b => b.status === 'pregnant')
     .map(b => ({
       ...b,
-      ewe:      activeSheep.find(s => s.id === b.ewedId),
+      ewe:      activeSheep.find(s => s.id === b.eweId),
       daysLeft: daysFromNow(b.expectedLambingDate),
     }))
     .sort((a, b) => a.daysLeft - b.daysLeft)
@@ -202,12 +205,50 @@ export default function Dashboard() {
 
   /* ── areas ── */
   const areaCards = areas.map((a, i) => {
-    const count = getSheepInArea(a.id).length
-    const pct   = Math.round((count / a.capacity) * 100)
+    const count = sheep.filter(s => s.areaId === a.id && s.status !== 'sold' && s.status !== 'dead').length
+    const pct   = Math.round((count / Math.max(a.capacity, 1)) * 100)
     return { ...a, count, pct, gradient: AREA_GRADIENTS[i % AREA_GRADIENTS.length] }
   })
 
+  /* ── monthly chart data ── */
+  const MONTH_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  const monthlyStats = MONTH_LABELS.map((month, i) => ({
+    month,
+    births: births.filter(b => new Date(b.birthDate || b.date).getMonth() === i).length,
+    deaths: deaths.filter(d => new Date(d.date).getMonth() === i).length,
+  })).filter((_, i) => {
+    // Show the last 10 months
+    const nowMonth = today.getMonth()
+    const diff = (nowMonth - i + 12) % 12
+    return diff < 10
+  }).sort((a, b) => {
+    const ai = MONTH_LABELS.indexOf(a.month)
+    const bi = MONTH_LABELS.indexOf(b.month)
+    const nowMonth = today.getMonth()
+    return ((ai - nowMonth + 12 - 9) % 12) - ((bi - nowMonth + 12 - 9) % 12)
+  })
+
   /* ─────────────────────────── render ─────────────────────── */
+  if (!activeFarm) {
+    return (
+      <div className="max-w-5xl mx-auto flex flex-col items-center justify-center py-24 text-center">
+        <div className="w-16 h-16 bg-farm-100 rounded-3xl flex items-center justify-center mb-5">
+          <Leaf size={28} className="text-farm-500" />
+        </div>
+        <h2 className="text-xl font-bold text-stone-900 mb-2">Welcome to SheepTrack</h2>
+        <p className="text-stone-400 text-sm mb-6 max-w-xs">
+          You don't have a farm yet. Create your first farm to start tracking your flock.
+        </p>
+        <button
+          onClick={() => navigate('/farms')}
+          className="px-5 py-2.5 bg-farm-400 hover:bg-farm-500 text-white font-semibold rounded-xl transition-colors text-sm"
+        >
+          Create my farm
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-5xl mx-auto space-y-6">
 
@@ -215,9 +256,9 @@ export default function Dashboard() {
       <div className="flex items-start justify-between">
         <div>
           <p className="text-stone-400 text-xs uppercase tracking-widest font-medium">{t('dash.welcomeBack')}</p>
-          <h1 className="text-2xl font-bold text-stone-900 tracking-tight mt-0.5">Groenplaas</h1>
+          <h1 className="text-2xl font-bold text-stone-900 tracking-tight mt-0.5">{activeFarm?.name ?? '—'}</h1>
           <p className="flex items-center gap-1 text-xs text-stone-400 mt-1">
-            <MapPin size={11} /> North Cape · Season 2025
+            <MapPin size={11} /> {activeFarm?.location ? `${activeFarm.location} · ` : ''}{activeFarm?.season ?? ''}
           </p>
         </div>
         <FarmLogo farm={activeFarm} size="md" />

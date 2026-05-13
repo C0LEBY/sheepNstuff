@@ -1,127 +1,146 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
+import { supabase, mapRow, toDb } from '../lib/supabase'
+import { useAuth } from './AuthContext'
 
-/* ─── seed data ─────────────────────────────────────────────────── */
-const SEED_USERS = [
-  { id: 'u1', name: 'Nathan Jonck',   email: 'nathan@groenplaas.co.za', initials: 'NJ' },
-  { id: 'u2', name: 'Jan van Wyk',    email: 'jan@groenplaas.co.za',    initials: 'JV' },
-  { id: 'u3', name: 'Pieter Botha',   email: 'pieter@botha.co.za',      initials: 'PB' },
-  { id: 'u4', name: 'Anri du Plessis',email: 'anri@duplessis.co.za',    initials: 'AP' },
-]
-
-const SEED_FARMS = [
-  {
-    id: 'f1',
-    name: 'Groenplaas',
-    location: 'North Cape, South Africa',
-    season: 'Season 2025',
-    logo: '/logos/groenplaas.svg',
-    members: [
-      { userId: 'u1', role: 'owner' },
-      { userId: 'u2', role: 'admin' },
-      { userId: 'u3', role: 'viewer' },
-    ],
-  },
-  {
-    id: 'f2',
-    name: 'Droëvlei',
-    location: 'Western Cape, South Africa',
-    season: 'Season 2025',
-    logo: null,
-    members: [
-      { userId: 'u1', role: 'owner' },
-      { userId: 'u4', role: 'admin' },
-    ],
-  },
-]
-
-/* ─── context ───────────────────────────────────────────────────── */
 const UserContext = createContext(null)
 
 export function UserProvider({ children }) {
-  const [currentUser]    = useState(SEED_USERS[0])          // logged-in user
-  const [allUsers, setAllUsers] = useState(SEED_USERS)
-  const [farms, setFarms]       = useState(SEED_FARMS)
-  const [activeFarmId, setActiveFarmId] = useState('f1')
+  const { user } = useAuth()
+  const [currentUser,  setCurrentUser]  = useState(null)
+  const [farms,        setFarms]        = useState([])
+  const [activeFarmId, setActiveFarmId] = useState(null)
+  const [loading,      setLoading]      = useState(true)
 
-  const activeFarm = farms.find(f => f.id === activeFarmId) || farms[0]
+  useEffect(() => {
+    if (!user) return
+    loadUserData()
+  }, [user?.id])
 
-  /* my farms = farms where currentUser is a member */
-  const myFarms = farms.filter(f => f.members.some(m => m.userId === currentUser.id))
+  /* ── load profile + farms ─────────────────────────── */
+  async function loadUserData() {
+    setLoading(true)
+    const { data: profile } = await supabase
+      .from('profiles').select('*').eq('id', user.id).single()
+    if (profile) setCurrentUser(mapRow(profile))
+    await refreshFarms()
+    setLoading(false)
+  }
 
-  /* current user's role in the active farm */
-  const myRole = activeFarm?.members.find(m => m.userId === currentUser.id)?.role || 'viewer'
-  const isOwnerOrAdmin = myRole === 'owner' || myRole === 'admin'
+  async function refreshFarms() {
+    const { data: rows } = await supabase
+      .from('farm_members')
+      .select('role, farms(*)')
+      .eq('user_id', user.id)
+    if (!rows) { setFarms([]); return }
 
-  /* ── farm CRUD ── */
-  function createFarm({ name, location, season }) {
-    const newFarm = {
-      id: `f${Date.now()}`,
-      name, location,
-      season: season || 'Season 2025',
-      members: [{ userId: currentUser.id, role: 'owner' }],
-    }
+    const farmsWithMembers = await Promise.all(
+      rows.map(async row => {
+        const farm = mapRow(row.farms)
+        const { data: members } = await supabase
+          .from('farm_members')
+          .select('user_id, role, profiles(id, name, initials, email)')
+          .eq('farm_id', farm.id)
+        return {
+          ...farm,
+          members: (members || []).map(m => ({
+            userId: m.user_id,
+            role:   m.role,
+            user:   m.profiles ? mapRow(m.profiles) : null,
+          })),
+        }
+      })
+    )
+    setFarms(farmsWithMembers)
+    setActiveFarmId(prev => prev ?? farmsWithMembers[0]?.id ?? null)
+  }
+
+  /* ── farm CRUD ────────────────────────────────────── */
+  async function createFarm({ name, location, season }) {
+    const { data: farm, error } = await supabase
+      .from('farms')
+      .insert({ name, location, season: season || 'Season 2025', created_by: user.id })
+      .select().single()
+    if (error) return null
+    await supabase.from('farm_members')
+      .insert({ farm_id: farm.id, user_id: user.id, role: 'owner' })
+    const newFarm = { ...mapRow(farm), members: [{ userId: user.id, role: 'owner', user: currentUser }] }
     setFarms(prev => [...prev, newFarm])
     setActiveFarmId(newFarm.id)
     return newFarm
   }
 
-  function updateFarm(farmId, changes) {
+  async function updateFarm(farmId, changes) {
+    await supabase.from('farms').update(toDb(changes)).eq('id', farmId)
     setFarms(prev => prev.map(f => f.id === farmId ? { ...f, ...changes } : f))
   }
 
-  function setFarmLogo(farmId, logoDataUrl) {
+  async function setFarmLogo(farmId, logoDataUrl) {
+    await supabase.from('farms').update({ logo: logoDataUrl }).eq('id', farmId)
     setFarms(prev => prev.map(f => f.id === farmId ? { ...f, logo: logoDataUrl } : f))
   }
 
-  function deleteFarm(farmId) {
-    setFarms(prev => prev.filter(f => f.id !== farmId))
-    if (activeFarmId === farmId) setActiveFarmId(farms.find(f => f.id !== farmId)?.id || null)
+  async function deleteFarm(farmId) {
+    await supabase.from('farms').delete().eq('id', farmId)
+    const remaining = farms.filter(f => f.id !== farmId)
+    setFarms(remaining)
+    if (activeFarmId === farmId) setActiveFarmId(remaining[0]?.id ?? null)
   }
 
-  /* ── member CRUD ── */
-  function addMember(farmId, email, role = 'viewer') {
-    // find existing user or create a ghost invite
-    let user = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase())
-    if (!user) {
-      const parts = email.split('@')[0].split('.')
-      const initials = parts.map(p => p[0]?.toUpperCase() || '').join('').slice(0, 2) || '??'
-      user = { id: `u${Date.now()}`, name: email, email, initials, invited: true }
-      setAllUsers(prev => [...prev, user])
-    }
-    setFarms(prev => prev.map(f => {
-      if (f.id !== farmId) return f
-      if (f.members.some(m => m.userId === user.id)) return f   // already member
-      return { ...f, members: [...f.members, { userId: user.id, role }] }
-    }))
+  /* ── member CRUD ──────────────────────────────────── */
+  async function addMember(farmId, email, role = 'viewer') {
+    const { data: profile } = await supabase
+      .from('profiles').select('id').eq('email', email).single()
+    if (!profile) return { error: 'No account found with that email. They need to sign up first.' }
+    const { error } = await supabase.from('farm_members')
+      .insert({ farm_id: farmId, user_id: profile.id, role })
+    if (error) return { error: 'Could not add member.' }
+    await refreshFarms()
+    return { error: null }
   }
 
-  function removeMember(farmId, userId) {
-    setFarms(prev => prev.map(f => {
-      if (f.id !== farmId) return f
-      return { ...f, members: f.members.filter(m => m.userId !== userId) }
-    }))
+  async function removeMember(farmId, userId) {
+    await supabase.from('farm_members')
+      .delete().eq('farm_id', farmId).eq('user_id', userId)
+    setFarms(prev => prev.map(f =>
+      f.id !== farmId ? f : { ...f, members: f.members.filter(m => m.userId !== userId) }
+    ))
   }
 
-  function updateMemberRole(farmId, userId, role) {
-    setFarms(prev => prev.map(f => {
-      if (f.id !== farmId) return f
-      return { ...f, members: f.members.map(m => m.userId === userId ? { ...m, role } : m) }
-    }))
+  async function updateMemberRole(farmId, userId, role) {
+    await supabase.from('farm_members')
+      .update({ role }).eq('farm_id', farmId).eq('user_id', userId)
+    setFarms(prev => prev.map(f =>
+      f.id !== farmId ? f : { ...f, members: f.members.map(m => m.userId === userId ? { ...m, role } : m) }
+    ))
   }
 
-  /* ── helper: resolve user object ── */
   function getUser(userId) {
-    return allUsers.find(u => u.id === userId) || { name: 'Unknown', initials: '??' }
+    for (const farm of farms) {
+      const m = farm.members?.find(m => m.userId === userId)
+      if (m?.user) return m.user
+    }
+    return { name: 'Unknown', initials: '??' }
   }
+
+  const activeFarm      = farms.find(f => f.id === activeFarmId) ?? farms[0] ?? null
+  const myFarms         = farms
+  const myRole          = activeFarm?.members?.find(m => m.userId === user?.id)?.role ?? 'viewer'
+  const isOwnerOrAdmin  = myRole === 'owner' || myRole === 'admin'
+
+  if (loading) return (
+    <div className="min-h-screen bg-cream-100 flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-farm-400 border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
 
   return (
     <UserContext.Provider value={{
-      currentUser, allUsers,
+      currentUser,
       farms, myFarms, activeFarm, activeFarmId, setActiveFarmId,
       myRole, isOwnerOrAdmin,
       createFarm, updateFarm, deleteFarm, setFarmLogo,
       addMember, removeMember, updateMemberRole,
-      getUser,
+      getUser, refreshFarms,
     }}>
       {children}
     </UserContext.Provider>

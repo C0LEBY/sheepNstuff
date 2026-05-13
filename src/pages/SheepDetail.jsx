@@ -4,7 +4,7 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from 'recharts'
 import { useFarm } from '../context/FarmContext'
-import { getAge, formatDate } from '../data/mockData'
+import { getAge, formatDate } from '../lib/utils'
 import Card, { CardHeader } from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
