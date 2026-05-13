@@ -84,25 +84,12 @@ export function UserProvider({ children }) {
 
   /* ── farm CRUD ────────────────────────────────────── */
   async function createFarm({ name, location, season }) {
-    // Generate ID client-side so we can insert farm_members immediately,
-    // without needing a SELECT (which RLS would block before membership exists).
-    const farmId = crypto.randomUUID()
-
-    const { error: farmErr } = await supabase
-      .from('farms')
-      .insert({ id: farmId, name, location, season: season || 'Season 2025', created_by: user.id })
-    if (farmErr) { console.error('createFarm farms error:', farmErr); return null }
-
-    const { error: memberErr } = await supabase
-      .from('farm_members')
-      .insert({ farm_id: farmId, user_id: user.id, role: 'owner' })
-    if (memberErr) {
-      console.error('createFarm members error:', memberErr)
-      await supabase.from('farms').delete().eq('id', farmId) // clean up orphan
-      return null
-    }
-
-    // Now that we're a member, refreshFarms can SELECT the new farm normally
+    const { error } = await supabase.rpc('create_farm_for_user', {
+      p_name:     name,
+      p_location: location || '',
+      p_season:   season  || 'Season 2025',
+    })
+    if (error) { console.error('createFarm rpc error:', error); return null }
     await refreshFarms()
     return true
   }

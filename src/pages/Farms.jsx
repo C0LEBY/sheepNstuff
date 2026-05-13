@@ -38,13 +38,22 @@ function RoleBadge({ role }) {
 /* ── Create Farm modal ─────────────────────────────────────────── */
 function CreateFarmModal({ open, onClose }) {
   const { createFarm } = useUser()
-  const [form, setForm] = useState({ name: '', location: '', season: 'Season 2025' })
+  const [form, setForm]       = useState({ name: '', location: '', season: 'Season 2025' })
+  const [saving, setSaving]   = useState(false)
+  const [error, setError]     = useState('')
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault()
     if (!form.name.trim()) return
-    createFarm(form)
+    setSaving(true)
+    setError('')
+    const result = await createFarm(form)
+    setSaving(false)
+    if (result === null) {
+      setError('Failed to create farm. Please try again.')
+      return
+    }
     setForm({ name: '', location: '', season: 'Season 2025' })
     onClose()
   }
@@ -67,9 +76,14 @@ function CreateFarmModal({ open, onClose }) {
           <label className={label}>Season</label>
           <input className={field} placeholder="e.g. Season 2025" value={form.season} onChange={e => set('season', e.target.value)} />
         </div>
+        {error && (
+          <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{error}</p>
+        )}
         <div className="flex gap-3 pt-1">
-          <Button variant="outline" onClick={onClose} className="flex-1">Cancel</Button>
-          <Button type="submit" className="flex-1">Create Farm</Button>
+          <Button variant="outline" onClick={onClose} className="flex-1" disabled={saving}>Cancel</Button>
+          <Button type="submit" className="flex-1" disabled={saving}>
+            {saving ? 'Creating…' : 'Create Farm'}
+          </Button>
         </div>
       </form>
     </Modal>
