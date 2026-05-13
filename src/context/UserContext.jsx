@@ -12,29 +12,42 @@ export function UserProvider({ children }) {
   const [loading,      setLoading]      = useState(true)
 
   useEffect(() => {
-    if (!user) return
+    if (!user) {
+      // No logged-in user — clear everything and stop loading
+      setCurrentUser(null)
+      setFarms([])
+      setActiveFarmId(null)
+      setLoading(false)
+      return
+    }
     loadUserData()
   }, [user?.id])
 
   /* ── load profile + farms ─────────────────────────── */
   async function loadUserData() {
     setLoading(true)
-    const { data: profile } = await supabase
-      .from('profiles').select('*').eq('id', user.id).single()
-    if (profile) setCurrentUser(mapRow(profile))
-    await refreshFarms()
-    setLoading(false)
+    try {
+      const { data: profile } = await supabase
+        .from('profiles').select('*').eq('id', user.id).single()
+      if (profile) setCurrentUser(mapRow(profile))
+      await refreshFarms()
+    } catch (err) {
+      console.error('loadUserData error:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   async function refreshFarms() {
-    const { data: rows } = await supabase
+    const { data: rows, error } = await supabase
       .from('farm_members')
       .select('role, farms(*)')
       .eq('user_id', user.id)
-    if (!rows) { setFarms([]); return }
+    if (error || !rows || rows.length === 0) { setFarms([]); return }
 
     const farmsWithMembers = await Promise.all(
       rows.map(async row => {
+        if (!row.farms) return null
         const farm = mapRow(row.farms)
         const { data: members } = await supabase
           .from('farm_members')
@@ -50,8 +63,9 @@ export function UserProvider({ children }) {
         }
       })
     )
-    setFarms(farmsWithMembers)
-    setActiveFarmId(prev => prev ?? farmsWithMembers[0]?.id ?? null)
+    const validFarms = farmsWithMembers.filter(Boolean)
+    setFarms(validFarms)
+    setActiveFarmId(prev => prev ?? validFarms[0]?.id ?? null)
   }
 
   /* ── farm CRUD ────────────────────────────────────── */

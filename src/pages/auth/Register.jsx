@@ -23,11 +23,15 @@ export default function Register() {
       return
     }
     setLoading(true)
-    const { error } = await signUp(email, password, name)
+    const { error, session } = await signUp(email, password, name)
     setLoading(false)
     if (error) {
       setError(error.message)
+    } else if (session) {
+      // Email confirm is OFF — user is immediately signed in, go straight to the app
+      navigate('/')
     } else {
+      // Email confirm is ON — user needs to verify before logging in
       setDone(true)
     }
   }
