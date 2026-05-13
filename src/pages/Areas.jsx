@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MapPin, AlertTriangle, MoveRight, Plus, Pencil, Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useFarm } from '../context/FarmContext'
@@ -21,12 +21,14 @@ function AreaFormModal({ open, onClose, existing }) {
   const isEdit = !!existing
 
   const blank = { name: '', type: 'pasture', capacity: '', description: '' }
-  const [form, setForm]     = useState(existing ?? blank)
+  const [form, setForm]     = useState(blank)
   const [saving, setSaving] = useState(false)
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
-  // Reset form when modal opens
-  function handleOpen() { setForm(existing ?? blank) }
+  // Sync form with existing data each time the modal opens
+  useEffect(() => {
+    if (open) setForm(existing ?? blank)
+  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function submit(e) {
     e.preventDefault()
@@ -42,7 +44,7 @@ function AreaFormModal({ open, onClose, existing }) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} onOpen={handleOpen}
+    <Modal open={open} onClose={onClose}
            title={isEdit ? 'Edit Area' : 'Add New Area'} size="sm">
       <form onSubmit={submit} className="space-y-4">
         <div>
