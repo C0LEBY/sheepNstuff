@@ -192,8 +192,18 @@ function AreaCard({ area, onMove, onEdit, onDelete, canEdit }) {
 
   const currentSheep  = sheep.filter(s => s.areaId === area.id && s.status !== 'sold' && s.status !== 'dead')
   const pct           = Math.round((currentSheep.length / Math.max(area.capacity, 1)) * 100)
-  const isOvercrowded = pct >= 90
-  const barColor      = pct >= 90 ? 'bg-red-400' : pct >= 70 ? 'bg-amber-400' : 'bg-farm-500'
+  const isOver        = currentSheep.length > area.capacity
+  const isAt          = currentSheep.length === area.capacity
+  const isNear        = !isOver && !isAt && pct >= 90
+  const barColor      = isOver ? 'bg-red-500' : pct >= 90 ? 'bg-red-400' : pct >= 70 ? 'bg-amber-400' : 'bg-farm-500'
+
+  const capacityLabel = isOver
+    ? { text: 'Over capacity', cls: 'text-red-700 bg-red-100' }
+    : isAt
+    ? { text: 'At capacity',   cls: 'text-red-600 bg-red-50' }
+    : isNear
+    ? { text: 'Near capacity', cls: 'text-amber-700 bg-amber-50' }
+    : null
 
   return (
     <Card>
@@ -208,9 +218,9 @@ function AreaCard({ area, onMove, onEdit, onDelete, canEdit }) {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          {isOvercrowded && (
-            <div className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-1 rounded-lg mr-1">
-              <AlertTriangle size={12} /> Near capacity
+          {capacityLabel && (
+            <div className={`flex items-center gap-1 text-xs px-2 py-1 rounded-lg mr-1 ${capacityLabel.cls}`}>
+              <AlertTriangle size={12} /> {capacityLabel.text}
             </div>
           )}
           {canEdit && (

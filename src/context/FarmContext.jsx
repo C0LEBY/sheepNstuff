@@ -81,9 +81,14 @@ export function FarmProvider({ children }) {
   }
 
   async function updateSheep(id, updates) {
-    const { error } = await supabase.from('sheep').update(toDb(updates)).eq('id', id)
+    const finalUpdates = { ...updates }
+    // Auto-remove from area when marked dead or missing
+    if (updates.status === 'dead' || updates.status === 'missing') {
+      finalUpdates.areaId = null
+    }
+    const { error } = await supabase.from('sheep').update(toDb(finalUpdates)).eq('id', id)
     if (error) { showToast('Failed to update sheep', 'error'); return }
-    setSheep(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s))
+    setSheep(prev => prev.map(s => s.id === id ? { ...s, ...finalUpdates } : s))
     showToast('Sheep record updated')
   }
 

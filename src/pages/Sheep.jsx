@@ -115,18 +115,20 @@ function AddSheepModal({ open, onClose }) {
 }
 
 export default function Sheep() {
-  const { sheep, areas } = useFarm()
+  const { sheep, areas, updateSheep } = useFarm()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
-  const [search, setSearch]         = useState('')
-  const [filterSex, setFilterSex]   = useState('All')
-  const [filterBreed, setFilterBreed] = useState('All')
+  const [search, setSearch]             = useState('')
+  const [filterSex, setFilterSex]       = useState('All')
+  const [filterBreed, setFilterBreed]   = useState('All')
   const [filterStatus, setFilterStatus] = useState('All')
-  const [filterArea, setFilterArea]  = useState('All')
-  const [addOpen, setAddOpen]        = useState(false)
+  const [filterArea, setFilterArea]     = useState('All')
+  const [addOpen, setAddOpen]           = useState(false)
 
   useEffect(() => {
+    const area = searchParams.get('area')
+    if (area) setFilterArea(area)
     if (searchParams.get('add') === 'true') setAddOpen(true)
   }, [searchParams])
 
@@ -257,9 +259,27 @@ export default function Sheep() {
                       <td className="px-5 py-3 text-stone-700">{s.breed}</td>
                       <td className="px-5 py-3 text-stone-500">{getAge(s.dateOfBirth)}</td>
                       <td className="px-5 py-3 text-stone-600">{area?.name || <span className="text-stone-300">—</span>}</td>
-                      <td className="px-5 py-3"><Badge variant={s.status}>{s.status}</Badge></td>
+                      <td className="px-5 py-3" onClick={e => e.stopPropagation()}>
+                        <select
+                          value={s.status}
+                          onChange={e => updateSheep(s.id, { status: e.target.value })}
+                          className="text-xs border border-cream-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-farm-400 cursor-pointer"
+                        >
+                          {STATUSES.slice(1).map(st => (
+                            <option key={st} value={st}>{st.charAt(0).toUpperCase() + st.slice(1)}</option>
+                          ))}
+                        </select>
+                      </td>
                       <td className="px-5 py-3 text-stone-600">{s.weight ? `${s.weight} kg` : '—'}</td>
-                      <td className="px-5 py-3 text-stone-400"><ChevronRight size={16} /></td>
+                      <td className="px-5 py-3" onClick={e => e.stopPropagation()}>
+                        <button
+                          onClick={() => navigate(`/sheep/${s.id}`)}
+                          className="p-1.5 rounded-lg text-stone-400 hover:text-farm-600 hover:bg-farm-50 transition-colors"
+                          title="View sheep"
+                        >
+                          <ChevronRight size={16} />
+                        </button>
+                      </td>
                     </tr>
                   )
                 })}
@@ -272,20 +292,22 @@ export default function Sheep() {
             {filtered.map(s => {
               const area = areas.find(a => a.id === s.areaId)
               return (
-                <button
-                  key={s.id}
-                  onClick={() => navigate(`/sheep/${s.id}`)}
-                  className="w-full flex items-center gap-3 px-4 py-3.5 active:bg-cream-50 text-left"
-                >
-                  {/* Tag pill */}
-                  <div className="w-12 h-12 rounded-2xl bg-farm-50 border border-farm-100 flex items-center justify-center flex-shrink-0">
+                <div key={s.id} className="flex items-center gap-3 px-4 py-3.5">
+                  {/* Tag pill — tapping navigates */}
+                  <button
+                    onClick={() => navigate(`/sheep/${s.id}`)}
+                    className="w-12 h-12 rounded-2xl bg-farm-50 border border-farm-100 flex items-center justify-center flex-shrink-0 active:bg-farm-100"
+                  >
                     <span className="text-farm-700 font-bold text-[11px] leading-tight text-center px-0.5 break-all">
                       {s.tagNumber}
                     </span>
-                  </div>
+                  </button>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
+                  {/* Info — tapping navigates */}
+                  <button
+                    onClick={() => navigate(`/sheep/${s.id}`)}
+                    className="flex-1 min-w-0 text-left"
+                  >
                     <p className="font-semibold text-stone-900 text-sm leading-tight">
                       {s.name || s.tagNumber}
                       {s.name && <span className="font-normal text-stone-400 ml-1">#{s.tagNumber}</span>}
@@ -300,14 +322,28 @@ export default function Sheep() {
                         </>
                       )}
                     </div>
-                  </div>
+                  </button>
 
-                  {/* Status + arrow */}
+                  {/* Status select + view arrow */}
                   <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <Badge variant={s.status}>{s.status}</Badge>
-                    <ChevronRight size={14} className="text-stone-300" />
+                    <select
+                      value={s.status}
+                      onChange={e => updateSheep(s.id, { status: e.target.value })}
+                      className="text-xs border border-cream-200 rounded-lg px-1.5 py-1 bg-white focus:outline-none"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      {STATUSES.slice(1).map(st => (
+                        <option key={st} value={st}>{st.charAt(0).toUpperCase() + st.slice(1)}</option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => navigate(`/sheep/${s.id}`)}
+                      className="p-1 rounded-lg text-stone-300 hover:text-farm-600"
+                    >
+                      <ChevronRight size={16} />
+                    </button>
                   </div>
-                </button>
+                </div>
               )
             })}
           </div>
