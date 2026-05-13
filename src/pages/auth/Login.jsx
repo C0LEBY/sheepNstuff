@@ -27,8 +27,8 @@ export default function Login() {
   }
 
   function fillTestUser() {
-    setEmail('test@sheeptrack.co.za')
-    setPassword('Groenplaas2025')
+    setEmail('test2mail@mail.com')
+    setPassword('Tester2025')
     setShowPw(true)
   }
 
@@ -117,12 +117,12 @@ export default function Login() {
       <div className="mt-5 w-full max-w-sm bg-farm-50 border border-farm-200 rounded-2xl px-5 py-4">
         <p className="text-xs font-semibold text-farm-700 mb-0.5">🐑 Try the demo</p>
         <p className="text-xs text-farm-600 mb-3">
-          Log in with the test account to browse Groenplaas farm data.
+          Log in with the demo account to browse Rooiberg Plaas farm data.
         </p>
         <div className="flex items-center justify-between text-xs">
           <div className="space-y-0.5 text-stone-500">
-            <p><span className="font-medium text-stone-700">Email:</span> test@sheeptrack.co.za</p>
-            <p><span className="font-medium text-stone-700">Password:</span> Groenplaas2025</p>
+            <p><span className="font-medium text-stone-700">Email:</span> test2mail@mail.com</p>
+            <p><span className="font-medium text-stone-700">Password:</span> Tester2025</p>
           </div>
           <button
             onClick={fillTestUser}
