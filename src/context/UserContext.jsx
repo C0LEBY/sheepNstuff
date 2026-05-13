@@ -29,7 +29,21 @@ export function UserProvider({ children }) {
     try {
       const { data: profile } = await supabase
         .from('profiles').select('*').eq('id', user.id).single()
-      if (profile) setCurrentUser(mapRow(profile))
+
+      if (profile) {
+        setCurrentUser(mapRow(profile))
+      } else {
+        // Trigger may have failed — build profile from auth metadata and upsert
+        const meta     = user.user_metadata || {}
+        const name     = meta.name || user.email || ''
+        const parts    = name.trim().split(/\s+/)
+        const initials = (parts[0]?.[0] || '').toUpperCase() +
+                         (parts[1]?.[0] || '').toUpperCase()
+        const fallback = { id: user.id, name, initials: initials || '?', email: user.email }
+        await supabase.from('profiles').upsert(fallback, { onConflict: 'id' })
+        setCurrentUser(fallback)
+      }
+
       await refreshFarms()
     } catch (err) {
       console.error('loadUserData error:', err)
@@ -70,17 +84,27 @@ export function UserProvider({ children }) {
 
   /* ── farm CRUD ────────────────────────────────────── */
   async function createFarm({ name, location, season }) {
-    const { data: farm, error } = await supabase
+    // Generate ID client-side so we can insert farm_members immediately,
+    // without needing a SELECT (which RLS would block before membership exists).
+    const farmId = crypto.randomUUID()
+
+    const { error: farmErr } = await supabase
       .from('farms')
-      .insert({ name, location, season: season || 'Season 2025', created_by: user.id })
-      .select().single()
-    if (error) return null
-    await supabase.from('farm_members')
-      .insert({ farm_id: farm.id, user_id: user.id, role: 'owner' })
-    const newFarm = { ...mapRow(farm), members: [{ userId: user.id, role: 'owner', user: currentUser }] }
-    setFarms(prev => [...prev, newFarm])
-    setActiveFarmId(newFarm.id)
-    return newFarm
+      .insert({ id: farmId, name, location, season: season || 'Season 2025', created_by: user.id })
+    if (farmErr) { console.error('createFarm farms error:', farmErr); return null }
+
+    const { error: memberErr } = await supabase
+      .from('farm_members')
+      .insert({ farm_id: farmId, user_id: user.id, role: 'owner' })
+    if (memberErr) {
+      console.error('createFarm members error:', memberErr)
+      await supabase.from('farms').delete().eq('id', farmId) // clean up orphan
+      return null
+    }
+
+    // Now that we're a member, refreshFarms can SELECT the new farm normally
+    await refreshFarms()
+    return true
   }
 
   async function updateFarm(farmId, changes) {

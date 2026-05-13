@@ -4,6 +4,13 @@ import { Menu, AlertTriangle, Bell, ChevronRight, LogOut, Users, Check } from 'l
 import { useFarm } from '../../context/FarmContext'
 import { useUser } from '../../context/UserContext'
 import { useAuth } from '../../context/AuthContext'
+
+function getInitials(currentUser, authUser) {
+  if (currentUser?.initials) return currentUser.initials
+  const name = authUser?.user_metadata?.name || authUser?.email || ''
+  const parts = name.trim().split(/\s+/)
+  return ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase() || '?'
+}
 import FarmLogo from '../ui/FarmLogo'
 
 const AVATAR_COLORS = ['bg-farm-400','bg-blue-400','bg-purple-400','bg-amber-500','bg-pink-400']
@@ -16,13 +23,14 @@ function avatarColor(id = '') {
 export default function TopBar({ onMenuClick, title }) {
   const { tasks } = useFarm()
   const { currentUser, myFarms, activeFarm, activeFarmId, setActiveFarmId } = useUser()
-  const { signOut } = useAuth()
+  const { signOut, user: authUser } = useAuth()
   const navigate = useNavigate()
   const [showProfile, setShowProfile] = useState(false)
   const [showFarmSwitch, setShowFarmSwitch] = useState(false)
 
   const overdueTasks = tasks.filter(t => !t.completed && new Date(t.dueDate) < new Date())
-  const color = avatarColor(currentUser?.id)
+  const color    = avatarColor(currentUser?.id ?? authUser?.id)
+  const initials = getInitials(currentUser, authUser)
 
   function close() { setShowProfile(false); setShowFarmSwitch(false) }
 
@@ -58,7 +66,7 @@ export default function TopBar({ onMenuClick, title }) {
           onClick={() => { setShowProfile(v => !v); setShowFarmSwitch(false) }}
           className={`w-8 h-8 ${color} rounded-full flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity flex-shrink-0`}
         >
-          {currentUser?.initials ?? '?'}
+          {initials}
         </button>
 
         {showProfile && (
@@ -72,11 +80,13 @@ export default function TopBar({ onMenuClick, title }) {
                   <div className="px-4 py-3.5 border-b border-cream-100">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 ${color} rounded-full flex items-center justify-center text-white font-bold flex-shrink-0`}>
-                        {currentUser?.initials ?? '?'}
+                        {initials}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-stone-900 truncate">{currentUser?.name ?? 'Account'}</p>
-                        <p className="text-xs text-stone-400 truncate">{currentUser?.email ?? ''}</p>
+                        <p className="text-sm font-semibold text-stone-900 truncate">
+                          {currentUser?.name || authUser?.user_metadata?.name || authUser?.email || 'Account'}
+                        </p>
+                        <p className="text-xs text-stone-400 truncate">{currentUser?.email || authUser?.email || ''}</p>
                       </div>
                     </div>
                   </div>
