@@ -22,7 +22,7 @@ export default function TopBar({ onMenuClick, title }) {
   const [showFarmSwitch, setShowFarmSwitch] = useState(false)
 
   const overdueTasks = tasks.filter(t => !t.completed && new Date(t.dueDate) < new Date())
-  const color = avatarColor(currentUser.id)
+  const color = avatarColor(currentUser?.id)
 
   function close() { setShowProfile(false); setShowFarmSwitch(false) }
 
@@ -58,7 +58,7 @@ export default function TopBar({ onMenuClick, title }) {
           onClick={() => { setShowProfile(v => !v); setShowFarmSwitch(false) }}
           className={`w-8 h-8 ${color} rounded-full flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity flex-shrink-0`}
         >
-          {currentUser.initials}
+          {currentUser?.initials ?? '?'}
         </button>
 
         {showProfile && (
@@ -72,11 +72,11 @@ export default function TopBar({ onMenuClick, title }) {
                   <div className="px-4 py-3.5 border-b border-cream-100">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 ${color} rounded-full flex items-center justify-center text-white font-bold flex-shrink-0`}>
-                        {currentUser.initials}
+                        {currentUser?.initials ?? '?'}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-stone-900 truncate">{currentUser.name}</p>
-                        <p className="text-xs text-stone-400 truncate">{currentUser.email}</p>
+                        <p className="text-sm font-semibold text-stone-900 truncate">{currentUser?.name ?? 'Account'}</p>
+                        <p className="text-xs text-stone-400 truncate">{currentUser?.email ?? ''}</p>
                       </div>
                     </div>
                   </div>
