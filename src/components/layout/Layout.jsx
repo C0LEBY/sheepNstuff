@@ -5,6 +5,7 @@ import TopBar from './TopBar'
 import BottomNav from './BottomNav'
 import { useFarm } from '../../context/FarmContext'
 import { CheckCircle, AlertCircle } from 'lucide-react'
+import { Alert, AlertDescription } from '../../components/reui/alert'
 
 const PAGE_TITLES = {
   '/':          'Dashboard',
@@ -42,12 +43,11 @@ export default function Layout({ children }) {
       <BottomNav />
 
       {toast && (
-        <div className={[
-          'fixed bottom-24 lg:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2.5 px-5 py-3 rounded-2xl shadow-card-lg text-sm font-medium z-50 transition-all',
-          toast.type === 'success' ? 'bg-stone-900 text-white' : 'bg-red-600 text-white',
-        ].join(' ')}>
-          {toast.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-          {toast.message}
+        <div className="fixed bottom-24 lg:bottom-6 left-1/2 -translate-x-1/2 z-50 w-auto min-w-64 max-w-sm animate-in fade-in slide-in-from-bottom-2">
+          <Alert variant={toast.type === 'success' ? 'success' : 'destructive'} className="shadow-card-lg">
+            {toast.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+            <AlertDescription className="font-medium">{toast.message}</AlertDescription>
+          </Alert>
         </div>
       )}
     </div>

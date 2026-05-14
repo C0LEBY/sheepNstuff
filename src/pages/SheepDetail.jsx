@@ -10,6 +10,10 @@ import Card, { CardHeader } from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
+import {
+  Timeline, TimelineItem, TimelineHeader, TimelineTitle,
+  TimelineDate, TimelineContent, TimelineIndicator, TimelineSeparator,
+} from '../components/reui/timeline'
 
 export default function SheepDetail() {
   const { id } = useParams()
@@ -341,19 +345,27 @@ export default function SheepDetail() {
           {treatments.length === 0 ? (
             <p className="text-sm text-stone-400 py-2">No treatment records</p>
           ) : (
-            <div className="space-y-3">
-              {treatments.map(h => (
-                <div key={h.id} className="border-l-2 border-farm-200 pl-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-medium text-stone-800">{h.treatment}</p>
-                    <Badge variant={h.type}>{h.type.replace('_', ' ')}</Badge>
-                  </div>
-                  <p className="text-xs text-stone-500 mt-0.5">{formatDate(h.date)}{h.vet ? ` · ${h.vet}` : ''}</p>
-                  {h.notes && <p className="text-xs text-stone-500 mt-0.5">{h.notes}</p>}
-                  {h.followUpDate && <p className="text-xs text-amber-600 mt-0.5">Follow-up: {formatDate(h.followUpDate)}</p>}
-                </div>
+            <Timeline>
+              {treatments.map((h, i) => (
+                <TimelineItem key={h.id} step={i + 1}>
+                  <TimelineIndicator className="bg-farm-100 border-farm-400" />
+                  <TimelineSeparator />
+                  <TimelineHeader>
+                    <TimelineDate>{formatDate(h.date)}{h.vet ? ` · ${h.vet}` : ''}</TimelineDate>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <TimelineTitle>{h.treatment}</TimelineTitle>
+                      <Badge variant={h.type}>{h.type.replace('_', ' ')}</Badge>
+                    </div>
+                  </TimelineHeader>
+                  {(h.notes || h.followUpDate) && (
+                    <TimelineContent>
+                      {h.notes && <p>{h.notes}</p>}
+                      {h.followUpDate && <p className="text-amber-600">Follow-up: {formatDate(h.followUpDate)}</p>}
+                    </TimelineContent>
+                  )}
+                </TimelineItem>
               ))}
-            </div>
+            </Timeline>
           )}
         </Card>
 
@@ -363,30 +375,48 @@ export default function SheepDetail() {
           {lambBirths.length === 0 && breeding.length === 0 ? (
             <p className="text-sm text-stone-400 py-2">No breeding records</p>
           ) : (
-            <div className="space-y-3">
-              {breeding.map(b => (
-                <div key={b.id} className="border-l-2 border-purple-200 pl-3">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-stone-800">
-                      {b.ewedId === s.id ? 'Mated with ' : 'Sired '}
-                      {(b.ewedId === s.id
-                        ? sheep.find(x => x.id === b.ramId)?.tagNumber
-                        : sheep.find(x => x.id === b.ewedId)?.tagNumber) || '—'}
-                    </p>
-                    <Badge variant={b.status}>{b.status}</Badge>
-                  </div>
-                  <p className="text-xs text-stone-500 mt-0.5">Mating: {formatDate(b.matingDate)} · Expected: {formatDate(b.expectedLambingDate)}</p>
-                  {b.lambsProduced > 0 && <p className="text-xs text-farm-600 mt-0.5">{b.lambsProduced} lamb{b.lambsProduced > 1 ? 's' : ''} born</p>}
-                </div>
+            <Timeline>
+              {breeding.map((b, i) => {
+                const partner = b.ewedId === s.id
+                  ? sheep.find(x => x.id === b.ramId)
+                  : sheep.find(x => x.id === b.ewedId)
+                return (
+                  <TimelineItem key={b.id} step={i + 1}>
+                    <TimelineIndicator className="bg-purple-50 border-purple-400" />
+                    <TimelineSeparator />
+                    <TimelineHeader>
+                      <TimelineDate>Mating: {formatDate(b.matingDate)}</TimelineDate>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <TimelineTitle>
+                          {b.ewedId === s.id ? 'Mated with ' : 'Sired '}
+                          {partner?.tagNumber || '—'}
+                        </TimelineTitle>
+                        <Badge variant={b.status}>{b.status}</Badge>
+                      </div>
+                    </TimelineHeader>
+                    <TimelineContent>
+                      Expected: {formatDate(b.expectedLambingDate)}
+                      {b.lambsProduced > 0 && <span className="text-farm-600 ml-2">· {b.lambsProduced} lamb{b.lambsProduced > 1 ? 's' : ''} born</span>}
+                    </TimelineContent>
+                  </TimelineItem>
+                )
+              })}
+              {lambBirths.map((b, i) => (
+                <TimelineItem key={b.id} step={breeding.length + i + 1}>
+                  <TimelineIndicator className="bg-amber-50 border-amber-400" />
+                  <TimelineSeparator />
+                  <TimelineHeader>
+                    <TimelineDate>{formatDate(b.date)}</TimelineDate>
+                    <TimelineTitle>{b.lambCount} lamb{b.lambCount > 1 ? 's' : ''} — {b.type}</TimelineTitle>
+                  </TimelineHeader>
+                  {b.stillborns > 0 && (
+                    <TimelineContent>
+                      <span className="text-red-500">{b.stillborns} stillborn</span>
+                    </TimelineContent>
+                  )}
+                </TimelineItem>
               ))}
-              {lambBirths.map(b => (
-                <div key={b.id} className="border-l-2 border-amber-200 pl-3">
-                  <p className="text-sm font-medium text-stone-800">{b.lambCount} lamb{b.lambCount > 1 ? 's' : ''} — {b.type}</p>
-                  <p className="text-xs text-stone-500 mt-0.5">{formatDate(b.date)}</p>
-                  {b.stillborns > 0 && <p className="text-xs text-red-500">{b.stillborns} stillborn</p>}
-                </div>
-              ))}
-            </div>
+            </Timeline>
           )}
         </Card>
       </div>
