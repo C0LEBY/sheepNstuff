@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Plus, Search, Filter, ChevronRight } from 'lucide-react'
+import { Plus, Search, SlidersHorizontal, ChevronRight, X } from 'lucide-react'
 import { useFarm } from '../context/FarmContext'
 import { getAge } from '../lib/utils'
 import Card from '../components/ui/Card'
@@ -9,6 +9,12 @@ import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import PageHeader from '../components/ui/PageHeader'
 import EmptyState from '../components/ui/EmptyState'
+import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs'
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
+  DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator,
+  DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent,
+} from '../components/ui/dropdown-menu'
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from '../components/ui/table'
@@ -122,31 +128,48 @@ export default function Sheep() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
-  const [search, setSearch]             = useState('')
-  const [filterSex, setFilterSex]       = useState('All')
-  const [filterBreed, setFilterBreed]   = useState('All')
-  const [filterStatus, setFilterStatus] = useState('All')
-  const [filterArea, setFilterArea]     = useState('All')
-  const [addOpen, setAddOpen]           = useState(false)
+  const [search, setSearch]       = useState('')
+  const [filterSex, setFilterSex] = useState('all')
+  const [activeFilters, setActiveFilters] = useState([]) // [{ field, label, value }]
+  const [addOpen, setAddOpen]     = useState(false)
 
   useEffect(() => {
     const area = searchParams.get('area')
-    if (area) setFilterArea(area)
+    if (area) {
+      const found = areas.find(a => a.id === area)
+      if (found) addFilter({ field: 'area', label: 'Area', value: area, display: found.name })
+    }
     if (searchParams.get('add') === 'true') setAddOpen(true)
-  }, [searchParams])
+  }, [searchParams]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function addFilter(f) {
+    setActiveFilters(prev => {
+      const without = prev.filter(x => x.field !== f.field)
+      return [...without, f]
+    })
+  }
+  function removeFilter(field) {
+    setActiveFilters(prev => prev.filter(x => x.field !== field))
+  }
+  function clearFilters() {
+    setActiveFilters([])
+    setSearch('')
+    setFilterSex('all')
+  }
+
+  const hasFilters = activeFilters.length > 0 || search || filterSex !== 'all'
+
+  const getFilter = field => activeFilters.find(f => f.field === field)
 
   const filtered = sheep.filter(s => {
     const q = search.toLowerCase()
     const matchSearch = !q || s.tagNumber.toLowerCase().includes(q) || (s.name && s.name.toLowerCase().includes(q)) || s.breed.toLowerCase().includes(q)
-    const matchSex    = filterSex === 'All'    || s.sex === filterSex
-    const matchBreed  = filterBreed === 'All'  || s.breed === filterBreed
-    const matchStatus = filterStatus === 'All' || s.status === filterStatus
-    const matchArea   = filterArea === 'All'   || s.areaId === filterArea
+    const matchSex    = filterSex === 'all'  || s.sex === filterSex
+    const breedF  = getFilter('breed');  const matchBreed  = !breedF  || s.breed    === breedF.value
+    const statusF = getFilter('status'); const matchStatus = !statusF || s.status   === statusF.value
+    const areaF   = getFilter('area');   const matchArea   = !areaF   || s.areaId   === areaF.value
     return matchSearch && matchSex && matchBreed && matchStatus && matchArea
   })
-
-  const select        = 'text-sm border border-cream-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-farm-400'
-  const selectMobile = 'w-full text-sm border border-cream-300 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-farm-400'
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -156,72 +179,121 @@ export default function Sheep() {
         action={<Button onClick={() => setAddOpen(true)} icon={<Plus size={16} />}>Add Sheep</Button>}
       />
 
-      {/* Filters — mobile */}
-      <div className="sm:hidden mb-4 space-y-2.5">
-        <div className="relative">
-          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+      {/* ── Sex tabs (shared desktop + mobile) ───────────────────── */}
+      <Tabs value={filterSex} onValueChange={setFilterSex} className="mb-4">
+        <TabsList className="bg-cream-100 h-9 p-0.5 gap-0.5 overflow-x-auto hide-scrollbar w-full sm:w-auto">
+          {[
+            { value: 'all',    label: 'All' },
+            { value: 'ewe',    label: 'Ewes' },
+            { value: 'ram',    label: 'Rams' },
+            { value: 'lamb',   label: 'Lambs' },
+            { value: 'wether', label: 'Wethers' },
+          ].map(t => (
+            <TabsTrigger
+              key={t.value}
+              value={t.value}
+              className="flex-1 sm:flex-none text-xs sm:text-sm h-8 px-3 rounded-sm data-[state=active]:bg-white data-[state=active]:text-farm-700 data-[state=active]:shadow-sm text-stone-500 font-medium"
+            >
+              {t.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
+      {/* ── Search + filter chips bar ─────────────────────────────── */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        {/* Search */}
+        <div className="relative flex-1 min-w-48">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
           <input
             placeholder="Search tag, name, breed…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-3 py-2.5 text-sm border border-cream-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-farm-400"
+            className="w-full pl-9 pr-3 py-2 text-sm border border-cream-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-farm-400"
           />
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-0.5 hide-scrollbar">
-          {SEXES.map(s => (
-            <button
-              key={s}
-              onClick={() => setFilterSex(s)}
-              className={[
-                'px-3.5 py-1.5 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-colors',
-                filterSex === s ? 'bg-farm-500 text-white' : 'bg-white text-stone-600 shadow-card',
-              ].join(' ')}
-            >
-              {s === 'All' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1) + 's'}
-            </button>
-          ))}
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          <select className={selectMobile} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
-            {STATUSES.map(s => <option key={s}>{s === 'All' ? 'Any Status' : s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
-          </select>
-          <select className={selectMobile} value={filterBreed} onChange={e => setFilterBreed(e.target.value)}>
-            {BREEDS.map(b => <option key={b}>{b === 'All' ? 'Any Breed' : b}</option>)}
-          </select>
-          <select className={`${selectMobile} col-span-2`} value={filterArea} onChange={e => setFilterArea(e.target.value)}>
-            <option value="All">All Areas</option>
-            {areas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-          </select>
-        </div>
-      </div>
 
-      {/* Filters — desktop */}
-      <Card className="hidden sm:block mb-5">
-        <div className="flex flex-wrap gap-3">
-          <div className="flex-1 min-w-48 relative">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
-            <input
-              placeholder="Search by tag, name, or breed…"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-farm-400"
-            />
-          </div>
-          <select className={select} value={filterSex} onChange={e => setFilterSex(e.target.value)}>
-            {SEXES.map(s => <option key={s}>{s}</option>)}
-          </select>
-          <select className={select} value={filterBreed} onChange={e => setFilterBreed(e.target.value)}>
-            {BREEDS.map(b => <option key={b}>{b}</option>)}
-          </select>
-          <select className={select} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
-            {STATUSES.map(s => <option key={s}>{s}</option>)}
-          </select>
-          <select className={select} value={filterArea} onChange={e => setFilterArea(e.target.value)}>
-            <option value="All">All Areas</option>
-            {areas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-          </select>
-        </div>
-      </Card>
+        {/* Active filter chips */}
+        {activeFilters.map(f => (
+          <span
+            key={f.field}
+            className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-farm-50 border border-farm-200 text-farm-700"
+          >
+            <span className="text-farm-400 capitalize">{f.label}:</span>
+            {f.display || f.value}
+            <button onClick={() => removeFilter(f.field)} className="text-farm-400 hover:text-farm-700 ml-0.5">
+              <X size={12} />
+            </button>
+          </span>
+        ))}
+
+        {/* Add filter dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg border border-cream-300 bg-white text-stone-600 hover:bg-cream-50 hover:border-cream-400 transition-colors">
+              <SlidersHorizontal size={13} />
+              Add filter
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-44">
+            <DropdownMenuGroup>
+              {/* Status submenu */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="text-sm">Status</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-36">
+                  {STATUSES.slice(1).map(s => (
+                    <DropdownMenuItem key={s} className="text-sm capitalize"
+                      onSelect={() => addFilter({ field: 'status', label: 'Status', value: s, display: s.charAt(0).toUpperCase() + s.slice(1) })}>
+                      {s.charAt(0).toUpperCase() + s.slice(1)}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              {/* Breed submenu */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="text-sm">Breed</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-36">
+                  {BREEDS.slice(1).map(b => (
+                    <DropdownMenuItem key={b} className="text-sm"
+                      onSelect={() => addFilter({ field: 'breed', label: 'Breed', value: b, display: b })}>
+                      {b}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              {/* Area submenu */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="text-sm">Area</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-44">
+                  {areas.map(a => (
+                    <DropdownMenuItem key={a.id} className="text-sm"
+                      onSelect={() => addFilter({ field: 'area', label: 'Area', value: a.id, display: a.name })}>
+                      {a.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            </DropdownMenuGroup>
+
+            {hasFilters && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-sm text-red-500 focus:text-red-600" onSelect={clearFilters}>
+                  Clear all filters
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {hasFilters && (
+          <button onClick={clearFilters} className="text-xs text-stone-400 hover:text-stone-600 transition-colors">
+            Clear all
+          </button>
+        )}
+      </div>
 
       {/* Results count */}
       <p className="text-sm text-stone-500 mb-3">{filtered.length} sheep found</p>
