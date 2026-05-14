@@ -8,6 +8,7 @@ import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import PageHeader from '../components/ui/PageHeader'
 import StatCard from '../components/ui/StatCard'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/table'
 
 function AddTransactionModal({ open, onClose, defaultType = 'sale' }) {
   const { sheep, addTransaction } = useFarm()
@@ -162,36 +163,36 @@ export default function Sales() {
 
       <Card className="overflow-hidden p-0">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-cream-50 border-b border-cream-200">
-              <tr className="text-xs text-stone-500 uppercase tracking-wide">
-                <th className="text-left px-5 py-3 font-semibold">Date</th>
-                <th className="text-left px-5 py-3 font-semibold">Type</th>
-                <th className="text-left px-5 py-3 font-semibold">Count</th>
-                <th className="text-left px-5 py-3 font-semibold">Price / Head</th>
-                <th className="text-left px-5 py-3 font-semibold">Total</th>
-                <th className="text-left px-5 py-3 font-semibold">Party</th>
-                <th className="text-left px-5 py-3 font-semibold">Notes</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-cream-100">
+          <Table className="w-full text-sm">
+            <TableHeader className="bg-cream-50 border-b border-cream-200">
+              <TableRow className="text-xs text-stone-500 uppercase tracking-wide">
+                <TableHead className="text-left px-5 py-3 font-semibold">Date</TableHead>
+                <TableHead className="text-left px-5 py-3 font-semibold">Type</TableHead>
+                <TableHead className="text-left px-5 py-3 font-semibold">Count</TableHead>
+                <TableHead className="text-left px-5 py-3 font-semibold">Price / Head</TableHead>
+                <TableHead className="text-left px-5 py-3 font-semibold">Total</TableHead>
+                <TableHead className="text-left px-5 py-3 font-semibold">Party</TableHead>
+                <TableHead className="text-left px-5 py-3 font-semibold">Notes</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-cream-100">
               {sorted.map(tx => (
-                <tr key={tx.id} className="hover:bg-cream-50">
-                  <td className="px-5 py-3 text-stone-700 whitespace-nowrap">{formatDate(tx.date)}</td>
-                  <td className="px-5 py-3"><Badge variant={tx.type}>{tx.type}</Badge></td>
-                  <td className="px-5 py-3 font-semibold text-stone-900">{tx.count}</td>
-                  <td className="px-5 py-3 text-stone-700">R {tx.pricePerHead.toLocaleString()}</td>
-                  <td className="px-5 py-3">
+                <TableRow key={tx.id} className="hover:bg-cream-50">
+                  <TableCell className="px-5 py-3 text-stone-700 whitespace-nowrap">{formatDate(tx.date)}</TableCell>
+                  <TableCell className="px-5 py-3"><Badge variant={tx.type}>{tx.type}</Badge></TableCell>
+                  <TableCell className="px-5 py-3 font-semibold text-stone-900">{tx.count}</TableCell>
+                  <TableCell className="px-5 py-3 text-stone-700">R {tx.pricePerHead.toLocaleString()}</TableCell>
+                  <TableCell className="px-5 py-3">
                     <span className={`font-semibold ${tx.type === 'sale' ? 'text-farm-700' : 'text-red-600'}`}>
                       {tx.type === 'purchase' ? '–' : '+'}R {tx.totalAmount.toLocaleString()}
                     </span>
-                  </td>
-                  <td className="px-5 py-3 text-stone-700">{tx.party}</td>
-                  <td className="px-5 py-3 text-stone-400 max-w-40 truncate">{tx.notes || '—'}</td>
-                </tr>
+                  </TableCell>
+                  <TableCell className="px-5 py-3 text-stone-700">{tx.party}</TableCell>
+                  <TableCell className="px-5 py-3 text-stone-400 max-w-40 truncate">{tx.notes || '—'}</TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </Card>
 

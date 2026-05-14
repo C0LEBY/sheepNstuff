@@ -9,6 +9,9 @@ import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import PageHeader from '../components/ui/PageHeader'
 import EmptyState from '../components/ui/EmptyState'
+import {
+  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
+} from '../components/ui/table'
 
 const BREEDS = ['All', 'Merino', 'Dorper', 'Dohne', 'Suffolk', 'Damara']
 const SEXES  = ['All', 'ewe', 'ram', 'lamb', 'wether']
@@ -229,37 +232,37 @@ export default function Sheep() {
       ) : (
         <Card className="overflow-hidden p-0">
           {/* Desktop table */}
-          <div className="hidden sm:block overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-cream-50 border-b border-cream-200">
-                <tr className="text-xs text-stone-500 uppercase tracking-wide">
-                  <th className="text-left px-5 py-3 font-semibold">Tag</th>
-                  <th className="text-left px-5 py-3 font-semibold">Name</th>
-                  <th className="text-left px-5 py-3 font-semibold">Sex</th>
-                  <th className="text-left px-5 py-3 font-semibold">Breed</th>
-                  <th className="text-left px-5 py-3 font-semibold">Age</th>
-                  <th className="text-left px-5 py-3 font-semibold">Area</th>
-                  <th className="text-left px-5 py-3 font-semibold">Status</th>
-                  <th className="text-left px-5 py-3 font-semibold">Weight</th>
-                  <th className="px-5 py-3" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-cream-100">
+          <div className="hidden sm:block">
+            <Table>
+              <TableHeader className="bg-cream-50">
+                <TableRow className="border-cream-200 hover:bg-cream-50">
+                  <TableHead className="h-10 px-5 text-xs text-stone-500 uppercase tracking-wide font-semibold">Tag</TableHead>
+                  <TableHead className="h-10 px-5 text-xs text-stone-500 uppercase tracking-wide font-semibold">Name</TableHead>
+                  <TableHead className="h-10 px-5 text-xs text-stone-500 uppercase tracking-wide font-semibold">Sex</TableHead>
+                  <TableHead className="h-10 px-5 text-xs text-stone-500 uppercase tracking-wide font-semibold">Breed</TableHead>
+                  <TableHead className="h-10 px-5 text-xs text-stone-500 uppercase tracking-wide font-semibold">Age</TableHead>
+                  <TableHead className="h-10 px-5 text-xs text-stone-500 uppercase tracking-wide font-semibold">Area</TableHead>
+                  <TableHead className="h-10 px-5 text-xs text-stone-500 uppercase tracking-wide font-semibold">Status</TableHead>
+                  <TableHead className="h-10 px-5 text-xs text-stone-500 uppercase tracking-wide font-semibold">Weight</TableHead>
+                  <TableHead className="h-10 px-5" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {filtered.map(s => {
                   const area = areas.find(a => a.id === s.areaId)
                   return (
-                    <tr
+                    <TableRow
                       key={s.id}
                       onClick={() => navigate(`/sheep/${s.id}`)}
-                      className="hover:bg-cream-50 cursor-pointer transition-colors"
+                      className="border-cream-100 hover:bg-cream-50 cursor-pointer"
                     >
-                      <td className="px-5 py-3 font-semibold text-stone-900">{s.tagNumber}</td>
-                      <td className="px-5 py-3 text-stone-600">{s.name || <span className="text-stone-300">—</span>}</td>
-                      <td className="px-5 py-3"><Badge variant={s.sex}>{s.sex}</Badge></td>
-                      <td className="px-5 py-3 text-stone-700">{s.breed}</td>
-                      <td className="px-5 py-3 text-stone-500">{getAge(s.dateOfBirth)}</td>
-                      <td className="px-5 py-3 text-stone-600">{area?.name || <span className="text-stone-300">—</span>}</td>
-                      <td className="px-5 py-3" onClick={e => e.stopPropagation()}>
+                      <TableCell className="px-5 py-3 font-semibold text-stone-900">{s.tagNumber}</TableCell>
+                      <TableCell className="px-5 py-3 text-stone-600">{s.name || <span className="text-stone-300">—</span>}</TableCell>
+                      <TableCell className="px-5 py-3"><Badge variant={s.sex}>{s.sex}</Badge></TableCell>
+                      <TableCell className="px-5 py-3 text-stone-700">{s.breed}</TableCell>
+                      <TableCell className="px-5 py-3 text-stone-500">{getAge(s.dateOfBirth)}</TableCell>
+                      <TableCell className="px-5 py-3 text-stone-600">{area?.name || <span className="text-stone-300">—</span>}</TableCell>
+                      <TableCell className="px-5 py-3" onClick={e => e.stopPropagation()}>
                         <select
                           value={s.status}
                           onChange={e => updateSheep(s.id, { status: e.target.value })}
@@ -269,9 +272,9 @@ export default function Sheep() {
                             <option key={st} value={st}>{st.charAt(0).toUpperCase() + st.slice(1)}</option>
                           ))}
                         </select>
-                      </td>
-                      <td className="px-5 py-3 text-stone-600">{s.weight ? `${s.weight} kg` : '—'}</td>
-                      <td className="px-5 py-3" onClick={e => e.stopPropagation()}>
+                      </TableCell>
+                      <TableCell className="px-5 py-3 text-stone-600">{s.weight ? `${s.weight} kg` : '—'}</TableCell>
+                      <TableCell className="px-5 py-3" onClick={e => e.stopPropagation()}>
                         <button
                           onClick={() => navigate(`/sheep/${s.id}`)}
                           className="p-1.5 rounded-lg text-stone-400 hover:text-farm-600 hover:bg-farm-50 transition-colors"
@@ -279,12 +282,12 @@ export default function Sheep() {
                         >
                           <ChevronRight size={16} />
                         </button>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   )
                 })}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
 
           {/* Mobile cards */}

@@ -9,6 +9,7 @@ import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import PageHeader from '../components/ui/PageHeader'
 import EmptyState from '../components/ui/EmptyState'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/table'
 
 function AddBirthModal({ open, onClose }) {
   const { sheep, areas, addBirth, addSheep } = useFarm()
@@ -204,46 +205,46 @@ export default function Births() {
       ) : (
         <Card className="overflow-hidden p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-cream-50 border-b border-cream-200">
-                <tr className="text-xs text-stone-500 uppercase tracking-wide">
-                  <th className="text-left px-5 py-3 font-semibold">Date</th>
-                  <th className="text-left px-5 py-3 font-semibold">Mother</th>
-                  <th className="text-left px-5 py-3 font-semibold">Father</th>
-                  <th className="text-left px-5 py-3 font-semibold">Lambs</th>
-                  <th className="text-left px-5 py-3 font-semibold">Type</th>
-                  <th className="text-left px-5 py-3 font-semibold">Stillborns</th>
-                  <th className="text-left px-5 py-3 font-semibold">Notes</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-cream-100">
+            <Table className="w-full text-sm">
+              <TableHeader className="bg-cream-50 border-b border-cream-200">
+                <TableRow className="text-xs text-stone-500 uppercase tracking-wide">
+                  <TableHead className="text-left px-5 py-3 font-semibold">Date</TableHead>
+                  <TableHead className="text-left px-5 py-3 font-semibold">Mother</TableHead>
+                  <TableHead className="text-left px-5 py-3 font-semibold">Father</TableHead>
+                  <TableHead className="text-left px-5 py-3 font-semibold">Lambs</TableHead>
+                  <TableHead className="text-left px-5 py-3 font-semibold">Type</TableHead>
+                  <TableHead className="text-left px-5 py-3 font-semibold">Stillborns</TableHead>
+                  <TableHead className="text-left px-5 py-3 font-semibold">Notes</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="divide-y divide-cream-100">
                 {sorted.map(b => {
                   const mother = sheep.find(s => s.id === b.motherId)
                   const father = sheep.find(s => s.id === b.fatherId)
                   return (
-                    <tr key={b.id} className="hover:bg-cream-50">
-                      <td className="px-5 py-3 text-stone-700 whitespace-nowrap">{formatDate(b.date)}</td>
-                      <td className="px-5 py-3 font-medium text-stone-900">
+                    <TableRow key={b.id} className="hover:bg-cream-50">
+                      <TableCell className="px-5 py-3 text-stone-700 whitespace-nowrap">{formatDate(b.date)}</TableCell>
+                      <TableCell className="px-5 py-3 font-medium text-stone-900">
                         {mother ? `${mother.tagNumber}${mother.name ? ` — ${mother.name}` : ''}` : '—'}
-                      </td>
-                      <td className="px-5 py-3 text-stone-600">
+                      </TableCell>
+                      <TableCell className="px-5 py-3 text-stone-600">
                         {father ? father.tagNumber : <span className="text-stone-300">—</span>}
-                      </td>
-                      <td className="px-5 py-3 font-semibold text-stone-900">{b.lambCount}</td>
-                      <td className="px-5 py-3">
+                      </TableCell>
+                      <TableCell className="px-5 py-3 font-semibold text-stone-900">{b.lambCount}</TableCell>
+                      <TableCell className="px-5 py-3">
                         <Badge variant={b.type === 'single' ? 'healthy' : 'mated'}>{b.type}</Badge>
-                      </td>
-                      <td className="px-5 py-3">
+                      </TableCell>
+                      <TableCell className="px-5 py-3">
                         {b.stillborns > 0
                           ? <span className="text-red-600 font-semibold">{b.stillborns}</span>
                           : <span className="text-stone-300">0</span>}
-                      </td>
-                      <td className="px-5 py-3 text-stone-500 max-w-48 truncate">{b.notes || '—'}</td>
-                    </tr>
+                      </TableCell>
+                      <TableCell className="px-5 py-3 text-stone-500 max-w-48 truncate">{b.notes || '—'}</TableCell>
+                    </TableRow>
                   )
                 })}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </Card>
       )}
