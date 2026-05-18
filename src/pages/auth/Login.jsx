@@ -36,10 +36,8 @@ export default function Login() {
     <div className="min-h-screen bg-cream-100 flex flex-col items-center justify-center px-4">
 
       {/* Logo */}
-      <div className="flex items-center gap-2.5 mb-8">
-        <div className="w-10 h-10 bg-farm-400 rounded-2xl flex items-center justify-center">
-          <span className="text-white font-bold text-sm tracking-tight">ST</span>
-        </div>
+      <div className="flex flex-col items-center gap-2 mb-8">
+        <img src="/sheep-logo.jpg" alt="Sheep N Stuff" className="w-16 h-16 object-contain" />
         <span className="font-bold text-stone-900 text-xl tracking-tight">SheepTrack</span>
       </div>
 
