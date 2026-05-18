@@ -42,9 +42,7 @@ export default function Sidebar({ open, onClose }) {
         {/* Logo */}
         <div className="flex items-center justify-between px-5 py-5 border-b border-cream-200">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-farm-400 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-xs tracking-tight">ST</span>
-            </div>
+            <img src="/sheep-logo.jpg" alt="Sheep N Stuff" className="w-8 h-8 object-contain rounded-lg" />
             <span className="font-bold text-stone-900 text-lg tracking-tight">SheepTrack</span>
           </div>
           <button onClick={onClose} className="lg:hidden p-1.5 rounded-lg text-stone-400 hover:bg-cream-100">
