@@ -37,7 +37,7 @@ export default function Login() {
 
       {/* Logo */}
       <div className="flex flex-col items-center gap-2 mb-8">
-        <img src="/sheep-logo.png" alt="Sheep N Stuff" className="w-16 h-16 object-contain" />
+        <img src="/sheep-logo.png" alt="Sheep N Stuff" className="w-[4.8rem] h-[4.8rem] object-contain" />
         <span className="font-bold text-stone-900 text-xl tracking-tight">SheepTrack</span>
       </div>
 
