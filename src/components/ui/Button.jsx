@@ -12,10 +12,10 @@ export default function Button({
 
   const variants = {
     primary:   'bg-farm-400 hover:bg-farm-500 text-white focus:ring-farm-400',
-    secondary: 'bg-cream-200 hover:bg-cream-300 text-stone-800 focus:ring-cream-300',
+    secondary: 'bg-cream-200 dark:bg-stone-700 hover:bg-cream-300 dark:hover:bg-stone-600 text-stone-800 dark:text-stone-200 focus:ring-cream-300',
     danger:    'bg-red-500 hover:bg-red-600 text-white focus:ring-red-400',
-    ghost:     'bg-transparent hover:bg-cream-100 text-stone-700 focus:ring-cream-200',
-    outline:   'bg-white border border-cream-300 hover:bg-cream-50 text-stone-700 focus:ring-cream-200',
+    ghost:     'bg-transparent hover:bg-cream-100 dark:hover:bg-[#332f2b] text-stone-700 dark:text-stone-300 focus:ring-cream-200',
+    outline:   'bg-white dark:bg-[#2a2825] border border-cream-300 dark:border-stone-600 hover:bg-cream-50 dark:hover:bg-[#332f2b] text-stone-700 dark:text-stone-300 focus:ring-cream-200',
   }
 
   const sizes = {

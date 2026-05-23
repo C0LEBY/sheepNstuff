@@ -33,18 +33,18 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-cream-100 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-cream-100 dark:bg-[#1e1c19] flex flex-col items-center justify-center px-4">
 
       {/* Logo */}
       <div className="flex flex-col items-center gap-2 mb-8">
-        <img src="/sheep-logo.png" alt="Sheep N Stuff" className="w-[4.8rem] h-[4.8rem] object-contain" />
-        <span className="font-bold text-stone-900 text-xl tracking-tight">SheepTrack</span>
+        <img src="/sheep-logo.png" alt="Sheep N Stuff" className="w-[4.8rem] h-[4.8rem] object-contain -mb-3" />
+        <span className="font-bold text-stone-900 dark:text-stone-100 text-xl tracking-tight">SheepTrack</span>
       </div>
 
       {/* Card */}
-      <div className="w-full max-w-sm bg-white rounded-3xl shadow-card p-8">
-        <h1 className="text-2xl font-bold text-stone-900 tracking-tight mb-1">Welcome back</h1>
-        <p className="text-sm text-stone-400 mb-6">Sign in to your farm account</p>
+      <div className="w-full max-w-sm bg-white dark:bg-[#2a2825] rounded-3xl shadow-card p-8">
+        <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-100 tracking-tight mb-1">Welcome back</h1>
+        <p className="text-sm text-stone-400 dark:text-stone-500 mb-6">Sign in to your farm account</p>
 
         {error && (
           <div className="mb-5 px-4 py-3 bg-red-50 border border-red-200 rounded-2xl text-sm text-red-600">
@@ -54,7 +54,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">Email</label>
+            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">Email</label>
             <input
               type="email"
               required
@@ -62,7 +62,7 @@ export default function Login() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full px-4 py-2.5 text-sm border border-cream-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-farm-400"
+              className="w-full px-4 py-2.5 text-sm border border-cream-300 dark:border-stone-600 rounded-xl bg-white dark:bg-[#1e1c19] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600 focus:outline-none focus:ring-2 focus:ring-farm-400"
             />
           </div>
 
@@ -103,7 +103,7 @@ export default function Login() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-stone-400 mt-6">
+        <p className="text-center text-sm text-stone-400 dark:text-stone-500 mt-6">
           Don't have an account?{' '}
           <Link to="/register" className="text-farm-600 hover:text-farm-700 font-semibold">
             Create one
@@ -112,15 +112,15 @@ export default function Login() {
       </div>
 
       {/* Test account shortcut */}
-      <div className="mt-5 w-full max-w-sm bg-farm-50 border border-farm-200 rounded-2xl px-5 py-4">
+      <div className="mt-5 w-full max-w-sm bg-farm-50 dark:bg-farm-900/20 border border-farm-200 dark:border-farm-800 rounded-2xl px-5 py-4">
         <p className="text-xs font-semibold text-farm-700 mb-0.5">🐑 Try the demo</p>
         <p className="text-xs text-farm-600 mb-3">
           Log in with the demo account to browse Rooiberg Plaas farm data.
         </p>
         <div className="flex items-center justify-between text-xs">
-          <div className="space-y-0.5 text-stone-500">
-            <p><span className="font-medium text-stone-700">Email:</span> test2mail@mail.com</p>
-            <p><span className="font-medium text-stone-700">Password:</span> Tester2025</p>
+          <div className="space-y-0.5 text-stone-500 dark:text-stone-400">
+            <p><span className="font-medium text-stone-700 dark:text-stone-300">Email:</span> test2mail@mail.com</p>
+            <p><span className="font-medium text-stone-700 dark:text-stone-300">Password:</span> Tester2025</p>
           </div>
           <button
             onClick={fillTestUser}

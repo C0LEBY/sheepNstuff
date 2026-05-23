@@ -14,7 +14,7 @@ export default function BottomNav() {
   const { t } = useLanguage()
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-cream-200 pb-safe">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white dark:bg-[#2a2825] border-t border-cream-200 dark:border-stone-700 pb-safe">
       <div className="flex">
         {ITEMS.map(({ to, key, icon: Icon }) => (
           <NavLink
@@ -23,14 +23,14 @@ export default function BottomNav() {
             end={to === '/'}
             className={({ isActive }) => [
               'flex-1 flex flex-col items-center gap-1 pt-3 pb-2 transition-colors',
-              isActive ? 'text-farm-400' : 'text-stone-400',
+              isActive ? 'text-farm-400' : 'text-stone-400 dark:text-stone-500',
             ].join(' ')}
           >
             {({ isActive }) => (
               <>
                 <div className={[
                   'w-9 h-7 flex items-center justify-center rounded-full transition-colors',
-                  isActive ? 'bg-farm-100' : '',
+                  isActive ? 'bg-farm-100 dark:bg-farm-900/30' : '',
                 ].join(' ')}>
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
                 </div>

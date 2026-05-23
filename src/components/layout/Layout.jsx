@@ -30,7 +30,7 @@ export default function Layout({ children }) {
   const title = PAGE_TITLES[pathKey] || 'SheepTrack'
 
   return (
-    <div className="flex h-screen overflow-hidden bg-cream-100">
+    <div className="flex h-screen overflow-hidden bg-cream-100 dark:bg-[#1e1c19]">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col min-w-0 lg:ml-64">

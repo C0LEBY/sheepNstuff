@@ -35,19 +35,19 @@ export default function TopBar({ onMenuClick, title }) {
   function close() { setShowProfile(false); setShowFarmSwitch(false) }
 
   return (
-    <header className="h-14 bg-white border-b border-cream-200 flex items-center px-4 gap-3 sticky top-0 z-10">
+    <header className="h-14 bg-white dark:bg-[#2a2825] border-b border-cream-200 dark:border-stone-700 flex items-center px-4 gap-3 sticky top-0 z-10">
       {/* Hamburger */}
-      <button onClick={onMenuClick} className="lg:hidden p-2 rounded-xl text-stone-500 hover:bg-cream-100 transition-colors">
+      <button onClick={onMenuClick} className="lg:hidden p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-cream-100 dark:hover:bg-[#332f2b] transition-colors">
         <Menu size={20} />
       </button>
 
       {/* Page title */}
-      <h1 className="text-base font-semibold text-stone-900 flex-1">{title}</h1>
+      <h1 className="text-base font-semibold text-stone-900 dark:text-stone-100 flex-1">{title}</h1>
 
       {/* Tasks bell */}
       <button
         onClick={() => navigate('/tasks')}
-        className="relative p-2 rounded-xl text-stone-500 hover:bg-cream-100 transition-colors"
+        className="relative p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-cream-100 dark:hover:bg-[#332f2b] transition-colors"
       >
         {overdueTasks.length > 0
           ? <AlertTriangle size={19} className="text-amber-500" />
@@ -72,18 +72,18 @@ export default function TopBar({ onMenuClick, title }) {
         {showProfile && (
           <>
             <div className="fixed inset-0 z-40" onClick={close} />
-            <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-card-lg border border-cream-200 z-50 overflow-hidden">
+            <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-[#2a2825] rounded-2xl shadow-card-lg border border-cream-200 dark:border-stone-700 z-50 overflow-hidden">
 
               {!showFarmSwitch ? (
                 <>
                   {/* User info */}
-                  <div className="px-4 py-3.5 border-b border-cream-100">
+                  <div className="px-4 py-3.5 border-b border-cream-100 dark:border-stone-800">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 ${color} rounded-full flex items-center justify-center text-white font-bold flex-shrink-0`}>
                         {initials}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-stone-900 truncate">
+                        <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 truncate">
                           {currentUser?.name || authUser?.user_metadata?.name || authUser?.email || 'Account'}
                         </p>
                         <p className="text-xs text-stone-400 truncate">{currentUser?.email || authUser?.email || ''}</p>
@@ -93,18 +93,18 @@ export default function TopBar({ onMenuClick, title }) {
 
                   {/* Active farm */}
                   {activeFarm && (
-                    <div className="px-4 py-2.5 border-b border-cream-100">
-                      <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-1">Active Farm</p>
+                    <div className="px-4 py-2.5 border-b border-cream-100 dark:border-stone-800">
+                      <p className="text-[10px] font-semibold text-stone-400 dark:text-stone-500 uppercase tracking-wide mb-1">Active Farm</p>
                       <button
                         onClick={() => setShowFarmSwitch(true)}
-                        className="w-full flex items-center gap-2.5 hover:bg-cream-50 rounded-xl p-1.5 -m-1.5 transition-colors"
+                        className="w-full flex items-center gap-2.5 hover:bg-cream-50 dark:hover:bg-[#332f2b] rounded-xl p-1.5 -m-1.5 transition-colors"
                       >
                         <FarmLogo farm={activeFarm} size="xs" />
                         <div className="flex-1 min-w-0 text-left">
-                          <p className="text-sm font-medium text-stone-800 truncate">{activeFarm.name}</p>
-                          {activeFarm.location && <p className="text-xs text-stone-400 truncate">{activeFarm.location}</p>}
+                          <p className="text-sm font-medium text-stone-800 dark:text-stone-200 truncate">{activeFarm.name}</p>
+                          {activeFarm.location && <p className="text-xs text-stone-400 dark:text-stone-500 truncate">{activeFarm.location}</p>}
                         </div>
-                        <ChevronRight size={14} className="text-stone-300 flex-shrink-0" />
+                        <ChevronRight size={14} className="text-stone-300 dark:text-stone-600 flex-shrink-0" />
                       </button>
                     </div>
                   )}
@@ -119,7 +119,7 @@ export default function TopBar({ onMenuClick, title }) {
                       <button
                         key={to}
                         onClick={() => { navigate(to); close() }}
-                        className="w-full text-left px-4 py-2.5 text-sm text-stone-700 hover:bg-cream-50 transition-colors flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-cream-50 dark:hover:bg-[#332f2b] transition-colors flex items-center gap-2"
                       >
                         {Icon && <Icon size={14} className="text-stone-400" />}
                         {label}
@@ -129,7 +129,7 @@ export default function TopBar({ onMenuClick, title }) {
 
                   {/* Overdue callout */}
                   {overdueTasks.length > 0 && (
-                    <div className="px-4 py-2.5 border-t border-cream-100">
+                    <div className="px-4 py-2.5 border-t border-cream-100 dark:border-stone-800">
                       <button
                         onClick={() => { navigate('/tasks'); close() }}
                         className="flex items-center gap-2 text-xs text-amber-600 font-semibold hover:text-amber-700"
@@ -141,10 +141,10 @@ export default function TopBar({ onMenuClick, title }) {
                   )}
 
                   {/* Sign out */}
-                  <div className="px-4 py-2.5 border-t border-cream-100">
+                  <div className="px-4 py-2.5 border-t border-cream-100 dark:border-stone-800">
                     <button
                       onClick={() => { signOut(); navigate('/login') }}
-                      className="flex items-center gap-2 text-sm text-stone-400 hover:text-red-500 transition-colors"
+                      className="flex items-center gap-2 text-sm text-stone-400 dark:text-stone-500 hover:text-red-500 transition-colors"
                     >
                       <LogOut size={14} /> Sign out
                     </button>
@@ -153,23 +153,23 @@ export default function TopBar({ onMenuClick, title }) {
               ) : (
                 /* Farm switcher sub-panel */
                 <>
-                  <div className="px-4 py-3 border-b border-cream-100 flex items-center gap-2">
-                    <button onClick={() => setShowFarmSwitch(false)} className="text-stone-400 hover:text-stone-600">
+                  <div className="px-4 py-3 border-b border-cream-100 dark:border-stone-800 flex items-center gap-2">
+                    <button onClick={() => setShowFarmSwitch(false)} className="text-stone-400 dark:text-stone-500 hover:text-stone-600">
                       <ChevronRight size={16} className="rotate-180" />
                     </button>
-                    <p className="text-sm font-semibold text-stone-800">Switch Farm</p>
+                    <p className="text-sm font-semibold text-stone-800 dark:text-stone-200">Switch Farm</p>
                   </div>
                   <div className="py-1.5 max-h-64 overflow-y-auto">
                     {myFarms.map(farm => (
                       <button
                         key={farm.id}
                         onClick={() => { setActiveFarmId(farm.id); close() }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-cream-50 transition-colors text-left"
+                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-cream-50 dark:hover:bg-[#332f2b] transition-colors text-left"
                       >
                         <FarmLogo farm={farm} size="sm" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-stone-800 truncate">{farm.name}</p>
-                          <p className="text-xs text-stone-400 truncate">{farm.members.length} members</p>
+                          <p className="text-sm font-medium text-stone-800 dark:text-stone-200 truncate">{farm.name}</p>
+                          <p className="text-xs text-stone-400 dark:text-stone-500 truncate">{farm.members.length} members</p>
                         </div>
                         {farm.id === activeFarmId && <Check size={15} className="text-farm-500 flex-shrink-0" />}
                       </button>

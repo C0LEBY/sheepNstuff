@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { FarmProvider }     from './context/FarmContext'
 import { UserProvider }     from './context/UserContext'
 import { LanguageProvider } from './context/LanguageContext'
+import { ThemeProvider }   from './context/ThemeContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Layout       from './components/layout/Layout'
 import Dashboard    from './pages/Dashboard'
@@ -42,6 +43,7 @@ function RedirectIfAuthed({ children }) {
 /* ── app ─────────────────────────────────────────────────────── */
 export default function App() {
   return (
+    <ThemeProvider>
     <LanguageProvider>
       <AuthProvider>
         <BrowserRouter>
@@ -82,5 +84,6 @@ export default function App() {
         </BrowserRouter>
       </AuthProvider>
     </LanguageProvider>
+    </ThemeProvider>
   )
 }
