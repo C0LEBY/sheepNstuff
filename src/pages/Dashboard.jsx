@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   AlertTriangle, HeartPulse, CheckSquare, Baby, Heart,
   ArrowRight, Scale, TrendingUp, ShoppingCart, Users,
-  MapPin, Leaf, ChevronRight, Activity, Stethoscope, Search, X, Tag, Shield,
+  MapPin, Leaf, ChevronRight, Activity, Stethoscope, Search, X,
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -59,92 +59,18 @@ function AttentionCard({ count, label, sub, color = 'amber', onClick }) {
   )
 }
 
-/* ─── Flock Overview Style 1 — Kit Widget ──────────────────────
-   Label on top, big number, thin coloured progress bar below     */
-function FlockStyle1({ items }) {
+function StatPill({ label, value, accent, onClick }) {
   return (
-    <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
-      {items.map(s => (
-        <button key={s.label} onClick={s.onClick}
-          className="flex-shrink-0 sm:flex-1 bg-white dark:bg-[#2D2D2D] rounded-2xl p-4 min-w-[90px] text-left border border-cream-200 dark:border-stone-700 hover:shadow-card-hover transition-all">
-          <p className="text-xs text-stone-400 font-medium mb-2 truncate">{s.label}</p>
-          <p className="text-3xl font-bold text-stone-900 dark:text-stone-100 leading-none">{s.value}</p>
-          <div className="mt-3 h-1 bg-cream-200 dark:bg-stone-700 rounded-full overflow-hidden">
-            <div className={`h-1 ${s.bar} rounded-full transition-all`} style={{ width: s.pct }} />
-          </div>
-        </button>
-      ))}
-    </div>
-  )
-}
-
-/* ─── Flock Overview Style 2 — Bold Colour Cards ───────────────
-   Each stat gets its own vivid solid-colour background           */
-function FlockStyle2({ items }) {
-  return (
-    <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
-      {items.map(s => (
-        <button key={s.label} onClick={s.onClick}
-          className={`flex-shrink-0 sm:flex-1 ${s.solidBg} rounded-2xl px-4 pt-3.5 pb-3 min-w-[80px] text-center hover:opacity-90 transition-opacity`}>
-          <p className="text-2xl font-bold text-white leading-none">{s.value}</p>
-          <p className="text-[10px] font-medium mt-1.5 uppercase tracking-wide text-white/75">{s.label}</p>
-        </button>
-      ))}
-    </div>
-  )
-}
-
-/* ─── Flock Overview Style 3 — Icon + Number Grid ──────────────
-   3×2 grid, no scroll, icon bubble + big number + label         */
-function FlockStyle3({ items }) {
-  return (
-    <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-      {items.map(s => (
-        <button key={s.label} onClick={s.onClick}
-          className="bg-white dark:bg-[#2D2D2D] rounded-2xl p-4 flex flex-col items-center text-center gap-2 border border-cream-200 dark:border-stone-700 hover:shadow-card-hover transition-all">
-          <div className={`w-9 h-9 ${s.iconBg} dark:bg-opacity-20 rounded-xl flex items-center justify-center flex-shrink-0`}>
-            <s.icon size={17} className={s.iconClr} />
-          </div>
-          <p className="text-2xl font-bold text-stone-900 dark:text-stone-100 leading-none">{s.value}</p>
-          <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wide leading-tight">{s.label}</p>
-        </button>
-      ))}
-    </div>
-  )
-}
-
-/* ─── Flock Overview Style 4 — Single Summary Card ─────────────
-   One card, all stats in a divided row — no scroll              */
-function FlockStyle4({ items }) {
-  return (
-    <div className="bg-white dark:bg-[#2D2D2D] rounded-2xl border border-cream-200 dark:border-stone-700 shadow-card overflow-hidden">
-      <div className="grid grid-cols-3 sm:grid-cols-6 divide-x divide-y sm:divide-y-0 divide-cream-200 dark:divide-stone-700">
-        {items.map(s => (
-          <button key={s.label} onClick={s.onClick}
-            className="flex flex-col items-center py-4 px-3 hover:bg-cream-100 dark:hover:bg-[#333333] transition-colors">
-            <p className={`text-2xl font-bold leading-none ${s.numClr}`}>{s.value}</p>
-            <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wide mt-1.5">{s.label}</p>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-/* ─── Flock Overview Style 5 — Left-Border Accent Cards ────────
-   White cards with a thick coloured left border + sub-label     */
-function FlockStyle5({ items }) {
-  return (
-    <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
-      {items.map(s => (
-        <button key={s.label} onClick={s.onClick}
-          className={`flex-shrink-0 sm:flex-1 bg-white dark:bg-[#2D2D2D] rounded-r-2xl border-l-4 ${s.border} shadow-card px-4 py-3.5 min-w-[110px] text-left hover:shadow-card-hover transition-all`}>
-          <p className="text-xs text-stone-400 dark:text-stone-500 font-medium leading-none truncate">{s.label}</p>
-          <p className="text-3xl font-bold text-stone-900 dark:text-stone-100 leading-none my-1.5">{s.value}</p>
-          <p className="text-[10px] text-stone-400 dark:text-stone-500 truncate">{s.sub}</p>
-        </button>
-      ))}
-    </div>
+    <button
+      onClick={onClick}
+      className={[
+        'flex-shrink-0 sm:flex-1 flex flex-col items-center px-4 pt-3.5 pb-3 rounded-2xl shadow-card text-center hover:opacity-80 transition-opacity min-w-[72px]',
+        accent ? 'bg-farm-400' : 'bg-white dark:bg-[#2D2D2D]',
+      ].join(' ')}
+    >
+      <p className={`text-2xl font-bold leading-none ${accent ? 'text-white' : 'text-stone-900 dark:text-stone-100'}`}>{value}</p>
+      <p className={`text-[10px] font-medium mt-1.5 uppercase tracking-wide ${accent ? 'text-white/70' : 'text-stone-400 dark:text-stone-500'}`}>{label}</p>
+    </button>
   )
 }
 
@@ -188,7 +114,6 @@ export default function Dashboard() {
 
   const [searchQuery, setSearchQuery]   = useState('')
   const [searchResults, setSearchResults] = useState([])
-  const [flockStyle, setFlockStyle] = useState(1)
 
   function handleSearch(q) {
     setSearchQuery(q)
@@ -381,92 +306,15 @@ export default function Dashboard() {
 
       {/* ══ 3. Flock overview ═══════════════════════════════════ */}
       <div>
-        {/* Header + style picker */}
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-stone-900 dark:text-stone-100">{t('dash.flockOverview')}</h2>
-          <div className="flex items-center gap-1 bg-cream-200 dark:bg-stone-700 rounded-xl p-1">
-            {[
-              { n: 1, label: 'Kit'    },
-              { n: 2, label: 'Bold'   },
-              { n: 3, label: 'Icons'  },
-              { n: 4, label: 'Row'    },
-              { n: 5, label: 'Border' },
-            ].map(({ n, label }) => (
-              <button
-                key={n}
-                onClick={() => setFlockStyle(n)}
-                className={[
-                  'px-2.5 py-1 rounded-lg text-xs font-semibold transition-all',
-                  flockStyle === n
-                    ? 'bg-white dark:bg-[#2D2D2D] text-stone-900 dark:text-stone-100 shadow-sm'
-                    : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300',
-                ].join(' ')}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+        <h2 className="text-base font-semibold text-stone-900 dark:text-stone-100 mb-3">{t('dash.flockOverview')}</h2>
+        <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+          <StatPill label={t('label.total')}      value={stats.totalSheep}    accent onClick={() => navigate('/sheep')} />
+          <StatPill label={t('sex.ewes')}         value={stats.ewes}          onClick={() => navigate('/sheep')} />
+          <StatPill label={t('sex.rams')}         value={stats.rams}          onClick={() => navigate('/sheep')} />
+          <StatPill label={t('sex.lambs')}        value={stats.lambs}         onClick={() => navigate('/sheep')} />
+          <StatPill label={t('status.pregnant')}  value={stats.pregnantEwes}  onClick={() => navigate('/breeding')} />
+          <StatPill label={t('status.sick')}      value={stats.sickSheep}     onClick={() => navigate('/health')} />
         </div>
-
-        {/* Shared data for all styles */}
-        {(() => {
-          const total = Math.max(stats.totalSheep, 1)
-          const items = [
-            {
-              label: t('label.total'),     value: stats.totalSheep, onClick: () => navigate('/sheep'),
-              bar: 'bg-farm-400',          pct: '100%',
-              solidBg: 'bg-farm-400',
-              icon: Tag,                   iconBg: 'bg-farm-100',    iconClr: 'text-farm-600',
-              numClr: 'text-farm-500',
-              border: 'border-l-farm-400', sub: 'active sheep',
-            },
-            {
-              label: t('sex.ewes'),        value: stats.ewes,        onClick: () => navigate('/sheep'),
-              bar: 'bg-pink-400',          pct: `${Math.round(stats.ewes/total*100)}%`,
-              solidBg: 'bg-pink-400',
-              icon: Heart,                 iconBg: 'bg-pink-100',    iconClr: 'text-pink-500',
-              numClr: 'text-stone-900 dark:text-stone-100',
-              border: 'border-l-pink-400', sub: `${Math.round(stats.ewes/total*100)}% of flock`,
-            },
-            {
-              label: t('sex.rams'),        value: stats.rams,        onClick: () => navigate('/sheep'),
-              bar: 'bg-blue-400',          pct: `${Math.round(stats.rams/total*100)}%`,
-              solidBg: 'bg-blue-500',
-              icon: Shield,                iconBg: 'bg-blue-100',    iconClr: 'text-blue-500',
-              numClr: 'text-stone-900 dark:text-stone-100',
-              border: 'border-l-blue-400', sub: `${Math.round(stats.rams/total*100)}% of flock`,
-            },
-            {
-              label: t('sex.lambs'),       value: stats.lambs,       onClick: () => navigate('/sheep'),
-              bar: 'bg-amber-400',         pct: `${Math.round(stats.lambs/total*100)}%`,
-              solidBg: 'bg-amber-400',
-              icon: Baby,                  iconBg: 'bg-amber-100',   iconClr: 'text-amber-600',
-              numClr: 'text-stone-900 dark:text-stone-100',
-              border: 'border-l-amber-400',sub: 'this season',
-            },
-            {
-              label: t('status.pregnant'), value: stats.pregnantEwes,onClick: () => navigate('/breeding'),
-              bar: 'bg-purple-400',        pct: `${Math.round(stats.pregnantEwes/Math.max(stats.ewes,1)*100)}%`,
-              solidBg: 'bg-purple-500',
-              icon: Activity,              iconBg: 'bg-purple-100',  iconClr: 'text-purple-500',
-              numClr: 'text-purple-600',
-              border: 'border-l-purple-400',sub: 'ewes confirmed',
-            },
-            {
-              label: t('status.sick'),     value: stats.sickSheep,   onClick: () => navigate('/health'),
-              bar: 'bg-[#FF4C51]',         pct: `${Math.round(stats.sickSheep/total*100)}%`,
-              solidBg: 'bg-[#FF4C51]',
-              icon: HeartPulse,            iconBg: 'bg-red-100',     iconClr: 'text-red-500',
-              numClr: 'text-[#FF4C51]',
-              border: 'border-l-[#FF4C51]',sub: 'need attention',
-            },
-          ]
-          if (flockStyle === 1) return <FlockStyle1 items={items} />
-          if (flockStyle === 2) return <FlockStyle2 items={items} />
-          if (flockStyle === 3) return <FlockStyle3 items={items} />
-          if (flockStyle === 4) return <FlockStyle4 items={items} />
-          if (flockStyle === 5) return <FlockStyle5 items={items} />
-        })()}
       </div>
 
       {/* ══ 4. Areas ════════════════════════════════════════════ */}
