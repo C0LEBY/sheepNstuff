@@ -17,7 +17,7 @@ export default function Modal({ open, onClose, title, children, size = 'md' }) {
       <div className="absolute inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       <div className={[
-        'relative bg-white dark:bg-[#2a2825] w-full rounded-t-4xl sm:rounded-3xl shadow-card-lg flex flex-col',
+        'relative bg-white dark:bg-[#2D2D2D] w-full rounded-t-4xl sm:rounded-3xl shadow-card-lg flex flex-col',
         sizes[size],
         'max-h-[92vh]',
       ].join(' ')}>
@@ -26,7 +26,7 @@ export default function Modal({ open, onClose, title, children, size = 'md' }) {
           <h2 className="text-base font-semibold text-stone-900 dark:text-stone-100">{title}</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-xl text-stone-400 dark:text-stone-500 hover:bg-cream-100 dark:hover:bg-[#332f2b] hover:text-stone-600 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-xl text-stone-400 dark:text-stone-500 hover:bg-cream-100 dark:hover:bg-[#333333] hover:text-stone-600 transition-colors"
           >
             <X size={18} />
           </button>

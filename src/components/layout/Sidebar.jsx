@@ -35,7 +35,7 @@ export default function Sidebar({ open, onClose }) {
       )}
 
       <aside className={[
-        'fixed top-0 left-0 h-full w-64 bg-white dark:bg-[#2a2825] border-r border-cream-200 dark:border-stone-700 flex flex-col z-30 transition-transform duration-300',
+        'fixed top-0 left-0 h-full w-64 bg-white dark:bg-[#2D2D2D] border-r border-cream-200 dark:border-stone-700 flex flex-col z-30 transition-transform duration-300',
         open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
       ].join(' ')}>
 
@@ -45,7 +45,7 @@ export default function Sidebar({ open, onClose }) {
             <img src="/sheep-logo.png" alt="Sheep N Stuff" className="w-12 h-12 object-contain -mb-2" />
             <span className="font-bold text-stone-900 dark:text-stone-100 text-sm tracking-tight">SheepTrack</span>
           </div>
-          <button onClick={onClose} className="lg:hidden p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:bg-cream-100 dark:hover:bg-[#332f2b]">
+          <button onClick={onClose} className="lg:hidden p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:bg-cream-100 dark:hover:bg-[#333333]">
             <X size={18} />
           </button>
         </div>
@@ -63,7 +63,7 @@ export default function Sidebar({ open, onClose }) {
                   'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
                   isActive
                     ? 'bg-farm-100 dark:bg-farm-900/30 text-farm-600 dark:text-farm-400'
-                    : 'text-stone-500 dark:text-stone-400 hover:bg-cream-100 dark:hover:bg-[#332f2b] hover:text-stone-800 dark:hover:text-stone-200',
+                    : 'text-stone-500 dark:text-stone-400 hover:bg-cream-100 dark:hover:bg-[#333333] hover:text-stone-800 dark:hover:text-stone-200',
                 ].join(' ')}
               >
                 {({ isActive }) => (

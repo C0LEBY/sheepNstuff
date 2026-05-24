@@ -24,7 +24,7 @@ export default function Settings() {
       </div>
 
       {/* Language section */}
-      <div className="bg-white dark:bg-[#2a2825] rounded-3xl shadow-card p-6 mb-5">
+      <div className="bg-white dark:bg-[#2D2D2D] rounded-3xl shadow-card p-6 mb-5">
         <div className="flex items-center gap-3 mb-5">
           <Globe size={18} className="text-farm-500" />
           <div>
@@ -42,7 +42,7 @@ export default function Settings() {
                 'w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border-2 transition-all text-left',
                 lang === lng.code
                   ? 'border-farm-400 bg-farm-50 dark:bg-farm-900/20'
-                  : 'border-cream-200 dark:border-stone-700 bg-white dark:bg-[#2a2825] hover:border-cream-300 dark:hover:border-stone-600 hover:bg-cream-50 dark:hover:bg-[#332f2b]',
+                  : 'border-cream-200 dark:border-stone-700 bg-white dark:bg-[#2D2D2D] hover:border-cream-300 dark:hover:border-stone-600 hover:bg-cream-50 dark:hover:bg-[#333333]',
               ].join(' ')}
             >
               <span className="text-2xl leading-none">{lng.flag}</span>
@@ -65,7 +65,7 @@ export default function Settings() {
       </div>
 
       {/* Appearance section */}
-      <div className="bg-white dark:bg-[#2a2825] rounded-3xl shadow-card p-6 mb-5">
+      <div className="bg-white dark:bg-[#2D2D2D] rounded-3xl shadow-card p-6 mb-5">
         <div className="flex items-center gap-3 mb-5">
           <Sun size={18} className="text-farm-500" />
           <div>
@@ -89,7 +89,7 @@ export default function Settings() {
                 'w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border-2 transition-all text-left',
                 theme === value
                   ? 'border-farm-400 bg-farm-50 dark:bg-farm-900/20'
-                  : 'border-cream-200 dark:border-stone-700 bg-white dark:bg-[#2a2825] hover:border-cream-300 dark:hover:border-stone-600 hover:bg-cream-50 dark:hover:bg-[#332f2b]',
+                  : 'border-cream-200 dark:border-stone-700 bg-white dark:bg-[#2D2D2D] hover:border-cream-300 dark:hover:border-stone-600 hover:bg-cream-50 dark:hover:bg-[#333333]',
               ].join(' ')}
             >
               <Icon size={20} className={theme === value ? 'text-farm-600' : 'text-stone-400 dark:text-stone-500'} />
@@ -111,9 +111,9 @@ export default function Settings() {
         { title: 'Notifications', titleAf: 'Kennisgewings' },
         { title: 'Data & Export',  titleAf: 'Data & Uitvoer' },
       ].map(s => (
-        <div key={s.title} className="bg-white dark:bg-[#2a2825] rounded-3xl shadow-card p-5 mb-3 flex items-center justify-between opacity-50">
+        <div key={s.title} className="bg-white dark:bg-[#2D2D2D] rounded-3xl shadow-card p-5 mb-3 flex items-center justify-between opacity-50">
           <p className="font-semibold text-stone-700 dark:text-stone-300 text-sm">{lang === 'af' ? s.titleAf : s.title}</p>
-          <span className="text-xs text-stone-400 bg-cream-100 dark:bg-[#332f2b] px-2.5 py-1 rounded-full">
+          <span className="text-xs text-stone-400 bg-cream-100 dark:bg-[#333333] px-2.5 py-1 rounded-full">
             {t('label.comingSoon')}
           </span>
         </div>

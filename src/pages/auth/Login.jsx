@@ -33,7 +33,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-cream-100 dark:bg-[#1e1c19] flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-cream-100 dark:bg-[#272727] flex flex-col items-center justify-center px-4">
 
       {/* Logo */}
       <div className="flex flex-col items-center gap-2 mb-8">
@@ -42,7 +42,7 @@ export default function Login() {
       </div>
 
       {/* Card */}
-      <div className="w-full max-w-sm bg-white dark:bg-[#2a2825] rounded-3xl shadow-card p-8">
+      <div className="w-full max-w-sm bg-white dark:bg-[#2D2D2D] rounded-3xl shadow-card p-8">
         <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-100 tracking-tight mb-1">Welcome back</h1>
         <p className="text-sm text-stone-400 dark:text-stone-500 mb-6">Sign in to your farm account</p>
 
@@ -62,7 +62,7 @@ export default function Login() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full px-4 py-2.5 text-sm border border-cream-300 dark:border-stone-600 rounded-xl bg-white dark:bg-[#1e1c19] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600 focus:outline-none focus:ring-2 focus:ring-farm-400"
+              className="w-full px-4 py-2.5 text-sm border border-cream-300 dark:border-stone-600 rounded-xl bg-white dark:bg-[#272727] text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600 focus:outline-none focus:ring-2 focus:ring-farm-400"
             />
           </div>
 

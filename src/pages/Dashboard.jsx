@@ -558,16 +558,16 @@ export default function Dashboard() {
           />
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={monthlyStats} barCategoryGap="25%" barGap={3} margin={{ top: 4, right: 4, bottom: 0, left: -18 }}>
-              <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#a8a29e' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: '#a8a29e' }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #E0E1D9', fontSize: 12 }} />
-              <Bar dataKey="births" name="Births" radius={[5, 5, 0, 0]} fill="#96CB3A" />
-              <Bar dataKey="deaths" name="Deaths" radius={[5, 5, 0, 0]} fill="#fca5a5" />
+              <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#969696' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: '#969696' }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #E8E8E8', fontSize: 12 }} />
+              <Bar dataKey="births" name="Births" radius={[5, 5, 0, 0]} fill="#56CA00" />
+              <Bar dataKey="deaths" name="Deaths" radius={[5, 5, 0, 0]} fill="#FF4C51" />
             </BarChart>
           </ResponsiveContainer>
           <div className="flex items-center gap-4 mt-2 text-xs text-stone-400">
             <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-farm-400 inline-block" /> Births</span>
-            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-red-300 inline-block" /> Deaths</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#FF4C51] inline-block" /> Deaths</span>
           </div>
         </Card>
       </div>
@@ -593,12 +593,12 @@ export default function Dashboard() {
             barCategoryGap="30%"
             margin={{ top: 4, right: 4, bottom: 0, left: -18 }}
           >
-            <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#a8a29e' }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: '#a8a29e' }} axisLine={false} tickLine={false} />
-            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #E0E1D9', fontSize: 12 }}
+            <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#969696' }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: '#969696' }} axisLine={false} tickLine={false} />
+            <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #E8E8E8', fontSize: 12 }}
               formatter={(v, n) => [v, n === 'count' ? 'Sheep' : 'Capacity']} />
-            <Bar dataKey="count"    name="count"    radius={[5, 5, 0, 0]} fill="#96CB3A" />
-            <Bar dataKey="capacity" name="capacity" radius={[5, 5, 0, 0]} fill="#E3F3CB" />
+            <Bar dataKey="count"    name="count"    radius={[5, 5, 0, 0]} fill="#56CA00" />
+            <Bar dataKey="capacity" name="capacity" radius={[5, 5, 0, 0]} fill="#ABEA70" />
           </BarChart>
         </ResponsiveContainer>
       </Card>

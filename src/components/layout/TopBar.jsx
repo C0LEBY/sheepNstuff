@@ -35,9 +35,9 @@ export default function TopBar({ onMenuClick, title }) {
   function close() { setShowProfile(false); setShowFarmSwitch(false) }
 
   return (
-    <header className="h-14 bg-white dark:bg-[#2a2825] border-b border-cream-200 dark:border-stone-700 flex items-center px-4 gap-3 sticky top-0 z-10">
+    <header className="h-14 bg-white dark:bg-[#2D2D2D] border-b border-cream-200 dark:border-stone-700 flex items-center px-4 gap-3 sticky top-0 z-10">
       {/* Hamburger */}
-      <button onClick={onMenuClick} className="lg:hidden p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-cream-100 dark:hover:bg-[#332f2b] transition-colors">
+      <button onClick={onMenuClick} className="lg:hidden p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-cream-100 dark:hover:bg-[#333333] transition-colors">
         <Menu size={20} />
       </button>
 
@@ -47,7 +47,7 @@ export default function TopBar({ onMenuClick, title }) {
       {/* Tasks bell */}
       <button
         onClick={() => navigate('/tasks')}
-        className="relative p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-cream-100 dark:hover:bg-[#332f2b] transition-colors"
+        className="relative p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-cream-100 dark:hover:bg-[#333333] transition-colors"
       >
         {overdueTasks.length > 0
           ? <AlertTriangle size={19} className="text-amber-500" />
@@ -72,7 +72,7 @@ export default function TopBar({ onMenuClick, title }) {
         {showProfile && (
           <>
             <div className="fixed inset-0 z-40" onClick={close} />
-            <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-[#2a2825] rounded-2xl shadow-card-lg border border-cream-200 dark:border-stone-700 z-50 overflow-hidden">
+            <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-[#2D2D2D] rounded-2xl shadow-card-lg border border-cream-200 dark:border-stone-700 z-50 overflow-hidden">
 
               {!showFarmSwitch ? (
                 <>
@@ -97,7 +97,7 @@ export default function TopBar({ onMenuClick, title }) {
                       <p className="text-[10px] font-semibold text-stone-400 dark:text-stone-500 uppercase tracking-wide mb-1">Active Farm</p>
                       <button
                         onClick={() => setShowFarmSwitch(true)}
-                        className="w-full flex items-center gap-2.5 hover:bg-cream-50 dark:hover:bg-[#332f2b] rounded-xl p-1.5 -m-1.5 transition-colors"
+                        className="w-full flex items-center gap-2.5 hover:bg-cream-50 dark:hover:bg-[#333333] rounded-xl p-1.5 -m-1.5 transition-colors"
                       >
                         <FarmLogo farm={activeFarm} size="xs" />
                         <div className="flex-1 min-w-0 text-left">
@@ -119,7 +119,7 @@ export default function TopBar({ onMenuClick, title }) {
                       <button
                         key={to}
                         onClick={() => { navigate(to); close() }}
-                        className="w-full text-left px-4 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-cream-50 dark:hover:bg-[#332f2b] transition-colors flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-cream-50 dark:hover:bg-[#333333] transition-colors flex items-center gap-2"
                       >
                         {Icon && <Icon size={14} className="text-stone-400" />}
                         {label}
@@ -164,7 +164,7 @@ export default function TopBar({ onMenuClick, title }) {
                       <button
                         key={farm.id}
                         onClick={() => { setActiveFarmId(farm.id); close() }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-cream-50 dark:hover:bg-[#332f2b] transition-colors text-left"
+                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-cream-50 dark:hover:bg-[#333333] transition-colors text-left"
                       >
                         <FarmLogo farm={farm} size="sm" />
                         <div className="flex-1 min-w-0">

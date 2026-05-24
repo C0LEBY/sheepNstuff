@@ -7,7 +7,7 @@ import {
   LineChart, Line, PieChart, Pie, Cell, Legend, CartesianGrid
 } from 'recharts'
 
-const COLORS = ['#4A8F6C', '#84BFA2', '#D97706', '#9333ea', '#3b82f6', '#ef4444']
+const COLORS = ['#56CA00', '#84BFA2', '#D97706', '#9333ea', '#3b82f6', '#ef4444']
 
 const MONTH_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
@@ -117,11 +117,11 @@ export default function Reports() {
           <CardHeader title="Births & Deaths per Month" subtitle="Year to date" />
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={monthlyStats} barCategoryGap="25%">
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#78716c' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#a8a29e' }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#969696' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#969696' }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="births" name="Births" radius={[4,4,0,0]} fill="#4A8F6C" />
-              <Bar dataKey="deaths" name="Deaths" radius={[4,4,0,0]} fill="#ef4444" />
+              <Bar dataKey="births" name="Births" radius={[4,4,0,0]} fill="#56CA00" />
+              <Bar dataKey="deaths" name="Deaths" radius={[4,4,0,0]} fill="#FF4C51" />
               <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
             </BarChart>
           </ResponsiveContainer>
@@ -135,7 +135,7 @@ export default function Reports() {
               <Pie data={bySex} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`} labelLine={false}>
                 {bySex.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Pie>
-              <Tooltip contentStyle={{ borderRadius: 10, border: '1px solid #e7e5e4', fontSize: 12 }} />
+              <Tooltip contentStyle={{ borderRadius: 10, border: '1px solid #E8E8E8', fontSize: 12 }} />
             </PieChart>
           </ResponsiveContainer>
           <div className="flex flex-wrap gap-3 justify-center">
@@ -153,11 +153,11 @@ export default function Reports() {
           <CardHeader title="Area Occupancy" subtitle="Sheep per area vs capacity" />
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={areaOccupancy} barCategoryGap="30%">
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#78716c' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#a8a29e' }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#969696' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#969696' }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="sheep" name="Sheep" radius={[5,5,0,0]} fill="#4A8F6C" />
-              <Bar dataKey="capacity" name="Capacity" radius={[5,5,0,0]} fill="#D6EAE0" />
+              <Bar dataKey="sheep" name="Sheep" radius={[5,5,0,0]} fill="#56CA00" />
+              <Bar dataKey="capacity" name="Capacity" radius={[5,5,0,0]} fill="#ABEA70" />
             </BarChart>
           </ResponsiveContainer>
         </Card>
@@ -167,11 +167,11 @@ export default function Reports() {
           <CardHeader title="Monthly Sales & Purchases" />
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={monthlyStats} barCategoryGap="25%">
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#78716c' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#a8a29e' }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#969696' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#969696' }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="sales"     name="Sales"     radius={[4,4,0,0]} fill="#4A8F6C" />
-              <Bar dataKey="purchases" name="Purchases" radius={[4,4,0,0]} fill="#3b82f6" />
+              <Bar dataKey="sales"     name="Sales"     radius={[4,4,0,0]} fill="#56CA00" />
+              <Bar dataKey="purchases" name="Purchases" radius={[4,4,0,0]} fill="#16B1FF" />
               <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
             </BarChart>
           </ResponsiveContainer>
@@ -207,7 +207,7 @@ export default function Reports() {
               <Pie data={byHealth} cx="50%" cy="50%" outerRadius={75} dataKey="value" label={({ name, value }) => `${name} (${value})`} labelLine={true}>
                 {byHealth.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Pie>
-              <Tooltip contentStyle={{ borderRadius: 10, border: '1px solid #e7e5e4', fontSize: 12 }} />
+              <Tooltip contentStyle={{ borderRadius: 10, border: '1px solid #E8E8E8', fontSize: 12 }} />
             </PieChart>
           </ResponsiveContainer>
         </Card>

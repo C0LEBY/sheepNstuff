@@ -14,7 +14,7 @@ export default function BottomNav() {
   const { t } = useLanguage()
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white dark:bg-[#2a2825] border-t border-cream-200 dark:border-stone-700 pb-safe">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white dark:bg-[#2D2D2D] border-t border-cream-200 dark:border-stone-700 pb-safe">
       <div className="flex">
         {ITEMS.map(({ to, key, icon: Icon }) => (
           <NavLink

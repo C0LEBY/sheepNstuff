@@ -323,11 +323,11 @@ export default function SheepDetail() {
             <CardHeader title="Weight History" subtitle={`Current: ${s.weight} kg`} icon={<Scale size={16} />} />
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={wh}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0ede8" />
-                <XAxis dataKey="date" tickFormatter={d => formatDate(d).split(' ').slice(0, 2).join(' ')} tick={{ fontSize: 11, fill: '#78716c' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#a8a29e' }} axisLine={false} tickLine={false} unit=" kg" />
-                <Tooltip formatter={v => [`${v} kg`, 'Weight']} labelFormatter={d => formatDate(d)} contentStyle={{ borderRadius: 10, border: '1px solid #e7e5e4', fontSize: 12 }} />
-                <Line type="monotone" dataKey="weight" stroke="#4A8F6C" strokeWidth={2.5} dot={{ fill: '#4A8F6C', r: 4 }} activeDot={{ r: 6 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E8" />
+                <XAxis dataKey="date" tickFormatter={d => formatDate(d).split(' ').slice(0, 2).join(' ')} tick={{ fontSize: 11, fill: '#969696' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#969696' }} axisLine={false} tickLine={false} unit=" kg" />
+                <Tooltip formatter={v => [`${v} kg`, 'Weight']} labelFormatter={d => formatDate(d)} contentStyle={{ borderRadius: 10, border: '1px solid #E8E8E8', fontSize: 12 }} />
+                <Line type="monotone" dataKey="weight" stroke="#56CA00" strokeWidth={2.5} dot={{ fill: '#56CA00', r: 4 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </Card>

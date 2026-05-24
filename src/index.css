@@ -1,78 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ── Design tokens ────────────────────────────────────────────── */
 @theme {
-  /* Farm green palette */
-  --color-farm-50:  #F1F9E5;
-  --color-farm-100: #E3F3CB;
-  --color-farm-200: #C6E797;
-  --color-farm-300: #AADB63;
-  --color-farm-400: #96CB3A;
-  --color-farm-500: #7AAA28;
-  --color-farm-600: #618B1E;
-  --color-farm-700: #496B15;
-  --color-farm-800: #304C0C;
-  --color-farm-900: #182D04;
+  /* ── Kit Green (replaces farm-*) ──────────────────────────── */
+  --color-farm-50:  #EEF9E6;
+  --color-farm-100: #D4F2B8;
+  --color-farm-200: #ABEA70;
+  --color-farm-300: #82E028;
+  --color-farm-400: #56CA00;
+  --color-farm-500: #44A500;
+  --color-farm-600: #328000;
+  --color-farm-700: #215A00;
+  --color-farm-800: #103500;
+  --color-farm-900: #001000;
 
-  /* Cream / off-white palette */
-  --color-cream-50:  #FAFAF7;
-  --color-cream-100: #EDEEE8;
-  --color-cream-200: #E0E1D9;
-  --color-cream-300: #CECEC8;
-  --color-cream-400: #B4B4AC;
+  /* ── Kit Neutrals (replaces cream-*) ──────────────────────── */
+  --color-cream-50:  #FAFAFA;
+  --color-cream-100: #F7F7F7;
+  --color-cream-200: #E8E8E8;
+  --color-cream-300: #D0D0D0;
+  --color-cream-400: #B0B0B0;
 
-  /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  /* ── Override stone-* to neutral cool grays ───────────────── */
+  --color-stone-50:  #FAFAFA;
+  --color-stone-100: #F7F7F7;
+  --color-stone-200: #E8E8E8;
+  --color-stone-300: #CCCCCC;
+  --color-stone-400: #969696;
+  --color-stone-500: #767676;
+  --color-stone-600: #585757;
+  --color-stone-700: #313131;
+  --color-stone-800: #1C1C1C;
+  --color-stone-900: #1C1C1C;
 
-  /* Border radii */
+  /* ── Typography ──────────────────────────────────────────── */
+  --font-sans: 'Poppins', system-ui, -apple-system, sans-serif;
+
+  /* ── Border radii ────────────────────────────────────────── */
   --radius-4xl: 2rem;
   --radius-5xl: 2.5rem;
 
-  /* Shadows */
-  --shadow-card:      0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  /* ── Shadows ─────────────────────────────────────────────── */
+  --shadow-card:       0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.10);
-  --shadow-card-lg:   0 4px 16px rgba(0,0,0,0.08);
+  --shadow-card-lg:    0 4px 16px rgba(0,0,0,0.08);
 
-  /* shadcn/ui CSS variables (mapped to farm palette) */
-  --background:   oklch(98% 0.005 120);
-  --foreground:   oklch(15% 0.01 120);
-  --card:         oklch(100% 0 0);
-  --card-foreground: oklch(15% 0.01 120);
-  --popover:      oklch(100% 0 0);
-  --popover-foreground: oklch(15% 0.01 120);
-  --primary:      oklch(60% 0.15 130);
-  --primary-foreground: oklch(99% 0 0);
-  --secondary:    oklch(94% 0.01 120);
-  --secondary-foreground: oklch(20% 0.01 120);
-  --muted:        oklch(94% 0.01 120);
-  --muted-foreground: oklch(50% 0.01 120);
-  --accent:       oklch(94% 0.01 120);
-  --accent-foreground: oklch(20% 0.01 120);
-  --destructive:  oklch(55% 0.22 25);
+  /* ── shadcn/ui CSS variables ─────────────────────────────── */
+  --background:             oklch(98% 0 0);
+  --foreground:             oklch(13% 0 0);
+  --card:                   oklch(100% 0 0);
+  --card-foreground:        oklch(13% 0 0);
+  --popover:                oklch(100% 0 0);
+  --popover-foreground:     oklch(13% 0 0);
+  --primary:                oklch(64% 0.22 130);
+  --primary-foreground:     oklch(99% 0 0);
+  --secondary:              oklch(97% 0 0);
+  --secondary-foreground:   oklch(20% 0 0);
+  --muted:                  oklch(97% 0 0);
+  --muted-foreground:       oklch(52% 0 0);
+  --accent:                 oklch(97% 0 0);
+  --accent-foreground:      oklch(20% 0 0);
+  --destructive:            oklch(55% 0.22 25);
   --destructive-foreground: oklch(99% 0 0);
-  --border:       oklch(88% 0.01 120);
-  --input:        oklch(88% 0.01 120);
-  --ring:         oklch(60% 0.15 130);
-  --radius:       0.75rem;
+  --border:                 oklch(92% 0 0);
+  --input:                  oklch(92% 0 0);
+  --ring:                   oklch(64% 0.22 130);
+  --radius:                 0.75rem;
 
-  /* Status colours for badges/alerts */
-  --color-success:  oklch(55% 0.15 145);
-  --color-warning:  oklch(72% 0.18 60);
-  --color-info:     oklch(58% 0.18 240);
-  --color-error:    oklch(55% 0.22 25);
+  /* ── Status colours for badges/alerts ───────────────────── */
+  --color-success: #56CA00;
+  --color-warning: #FFB400;
+  --color-info:    #16B1FF;
+  --color-error:   #FF4C51;
 
-  /* reui component tokens */
-  --success:             var(--color-emerald-500);
-  --success-foreground:  var(--color-emerald-900);
-  --info:                var(--color-violet-500);
-  --info-foreground:     var(--color-violet-900);
+  /* ── reui component tokens ───────────────────────────────── */
+  --success:             var(--color-farm-400);
+  --success-foreground:  var(--color-farm-900);
+  --info:                var(--color-blue-500);
+  --info-foreground:     var(--color-blue-900);
   --warning:             var(--color-yellow-500);
   --warning-foreground:  var(--color-yellow-900);
-  --invert:              var(--color-zinc-900);
-  --invert-foreground:   var(--color-zinc-50);
-  --muted-foreground:    oklch(50% 0.01 120);
-  --card-foreground:     oklch(15% 0.01 120);
+  --invert:              var(--color-stone-900);
+  --invert-foreground:   var(--color-stone-50);
+  --muted-foreground:    oklch(52% 0 0);
+  --card-foreground:     oklch(13% 0 0);
 }
 
 /* ── Base styles ──────────────────────────────────────────────── */
@@ -80,14 +93,14 @@
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    background-color: #EDEEE8;
-    color: #1c1c1c;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #F7F7F7;
+    color: #1C1C1C;
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
   .dark body {
-    background-color: #1e1c19;
-    color: #f5f5f4;
+    background-color: #272727;
+    color: #E8E8E8;
   }
   #root {
     width: 100%;
@@ -95,21 +108,23 @@
   }
   /* Dark mode shadcn/ui tokens */
   .dark {
-    --background:   oklch(14% 0.005 60);
-    --foreground:   oklch(95% 0.005 60);
-    --card:         oklch(18% 0.005 60);
-    --card-foreground: oklch(95% 0.005 60);
-    --popover:      oklch(18% 0.005 60);
-    --popover-foreground: oklch(95% 0.005 60);
-    --secondary:    oklch(22% 0.005 60);
-    --secondary-foreground: oklch(90% 0.005 60);
-    --muted:        oklch(22% 0.005 60);
-    --muted-foreground: oklch(60% 0.005 60);
-    --accent:       oklch(22% 0.005 60);
-    --accent-foreground: oklch(90% 0.005 60);
-    --border:       oklch(28% 0.005 60);
-    --input:        oklch(28% 0.005 60);
+    --background:             oklch(16% 0 0);
+    --foreground:             oklch(93% 0 0);
+    --card:                   oklch(18% 0 0);
+    --card-foreground:        oklch(93% 0 0);
+    --popover:                oklch(18% 0 0);
+    --popover-foreground:     oklch(93% 0 0);
+    --secondary:              oklch(22% 0 0);
+    --secondary-foreground:   oklch(90% 0 0);
+    --muted:                  oklch(22% 0 0);
+    --muted-foreground:       oklch(62% 0 0);
+    --accent:                 oklch(22% 0 0);
+    --accent-foreground:      oklch(90% 0 0);
+    --border:                 oklch(22% 0 0);
+    --input:                  oklch(22% 0 0);
   }
+  .dark .scrollbar-thin { scrollbar-color: #313131 transparent; }
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb { background: #313131; }
 }
 
 /* ── Custom utilities ─────────────────────────────────────────── */
@@ -123,18 +138,12 @@
   }
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: #CECEC8 transparent;
+    scrollbar-color: #D0D0D0 transparent;
   }
   .scrollbar-thin::-webkit-scrollbar { width: 5px; }
   .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #CECEC8;
+    background: #D0D0D0;
     border-radius: 999px;
-  }
-  .dark .scrollbar-thin {
-    scrollbar-color: #44403c transparent;
-  }
-  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #44403c;
   }
 }
