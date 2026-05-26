@@ -4,6 +4,7 @@ import { UserProvider }     from './context/UserContext'
 import { LanguageProvider } from './context/LanguageContext'
 import { ThemeProvider }   from './context/ThemeContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { MediaProvider }   from './context/MediaContext'
 import Layout       from './components/layout/Layout'
 import Dashboard    from './pages/Dashboard'
 import Sheep        from './pages/Sheep'
@@ -60,6 +61,7 @@ export default function App() {
               <RequireAuth>
                 <UserProvider>
                   <FarmProvider>
+                  <MediaProvider>
                     <Layout>
                       <Routes>
                         <Route path="/"          element={<Dashboard />} />
@@ -76,6 +78,7 @@ export default function App() {
                         <Route path="/farms"     element={<Farms />} />
                       </Routes>
                     </Layout>
+                  </MediaProvider>
                   </FarmProvider>
                 </UserProvider>
               </RequireAuth>
