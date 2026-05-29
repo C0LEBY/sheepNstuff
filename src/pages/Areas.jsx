@@ -300,7 +300,7 @@ export default function Areas() {
       />
 
       {/* Summary row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-4 gap-2 mb-5">
         {[
           { label: 'Total Areas',   value: areas.length },
           { label: 'Pastures',      value: areas.filter(a => a.type === 'pasture').length },
@@ -310,9 +310,9 @@ export default function Areas() {
               return c / Math.max(a.capacity, 1) >= 0.9
             }).length },
         ].map(s => (
-          <div key={s.label} className="bg-white rounded-2xl shadow-card p-4 text-center">
-            <p className="text-2xl font-bold text-stone-900">{s.value}</p>
-            <p className="text-xs text-stone-500 mt-0.5">{s.label}</p>
+          <div key={s.label} className="bg-white rounded-xl shadow-card px-2 py-2.5 text-center">
+            <p className="text-xl font-bold text-stone-900">{s.value}</p>
+            <p className="text-[10px] text-stone-500 mt-0.5 leading-tight">{s.label}</p>
           </div>
         ))}
       </div>

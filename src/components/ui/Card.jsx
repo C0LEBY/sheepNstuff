@@ -7,7 +7,7 @@ export default function Card({ children, className = '', onClick, hover = false 
     <div
       onClick={onClick}
       className={cn(
-        'bg-white dark:bg-[#2D2D2D] rounded-3xl shadow-card p-5',
+        'bg-white dark:bg-[#2D2D2D] rounded-3xl shadow-card border border-cream-200 dark:border-stone-700 p-5',
         hover ? 'cursor-pointer hover:shadow-card-hover transition-shadow' : '',
         className,
       )}
