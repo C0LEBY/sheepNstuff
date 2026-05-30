@@ -71,7 +71,7 @@ export default function Sidebar({ open, onClose }) {
             <img
               src="/sheep-logo.png"
               alt="SheepTrack"
-              className="w-8 h-8 object-contain"
+              className="w-8 h-8 object-contain brightness-0 invert"
             />
             <span className="font-bold text-white text-base tracking-tight leading-none">
               SheepTrack
