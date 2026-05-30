@@ -1,105 +1,144 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Tag, MapPin, Baby, HeartPulse,
-  Heart, ShoppingCart, CheckSquare, BarChart3, Settings, X, Plus
+  Heart, ShoppingCart, CheckSquare, BarChart3, Settings, X, Plus,
 } from 'lucide-react'
-import { useUser } from '../../context/UserContext'
+import { useUser }     from '../../context/UserContext'
 import { useLanguage } from '../../context/LanguageContext'
-import FarmLogo from '../ui/FarmLogo'
+import FarmLogo        from '../ui/FarmLogo'
 
-const NAV_ITEMS = [
-  { to: '/',          key: 'nav.dashboard', icon: LayoutDashboard },
-  { to: '/sheep',     key: 'nav.sheep',     icon: Tag },
-  { to: '/areas',     key: 'nav.areas',     icon: MapPin },
-  { to: '/births',    key: 'nav.births',    icon: Baby },
-  { to: '/health',    key: 'nav.health',    icon: HeartPulse },
-  { to: '/breeding',  key: 'nav.breeding',  icon: Heart },
-  { to: '/sales',     key: 'nav.sales',     icon: ShoppingCart },
-  { to: '/tasks',     key: 'nav.tasks',     icon: CheckSquare },
-  { to: '/reports',   key: 'nav.reports',   icon: BarChart3 },
-  { to: '/settings',  key: 'nav.settings',  icon: Settings },
+/* ── Navigation items ──────────────────────────────────────────── */
+const MAIN_NAV = [
+  { to: '/',         key: 'nav.dashboard', icon: LayoutDashboard },
+  { to: '/sheep',    key: 'nav.sheep',     icon: Tag             },
+  { to: '/areas',    key: 'nav.areas',     icon: MapPin          },
+  { to: '/births',   key: 'nav.births',    icon: Baby            },
+  { to: '/health',   key: 'nav.health',    icon: HeartPulse      },
+  { to: '/breeding', key: 'nav.breeding',  icon: Heart           },
+  { to: '/sales',    key: 'nav.sales',     icon: ShoppingCart    },
+  { to: '/tasks',    key: 'nav.tasks',     icon: CheckSquare     },
+  { to: '/reports',  key: 'nav.reports',   icon: BarChart3       },
 ]
 
+/* ── Single nav item ───────────────────────────────────────────── */
+function NavItem({ to, icon: Icon, label, onClose }) {
+  return (
+    <NavLink
+      to={to}
+      end={to === '/'}
+      onClick={onClose}
+      className={({ isActive }) =>
+        [
+          'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
+          isActive
+            ? 'bg-white/[0.08] text-white'
+            : 'text-slate-400 hover:text-slate-200 hover:bg-white/5',
+        ].join(' ')
+      }
+    >
+      <Icon size={18} strokeWidth={1.5} />
+      <span>{label}</span>
+    </NavLink>
+  )
+}
+
+/* ── Sidebar ───────────────────────────────────────────────────── */
 export default function Sidebar({ open, onClose }) {
   const { activeFarm } = useUser()
-  const { t } = useLanguage()
-  const navigate = useNavigate()
+  const { t }          = useLanguage()
+  const navigate       = useNavigate()
 
   return (
     <>
+      {/* Mobile overlay */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-20 lg:hidden"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-20 lg:hidden"
           onClick={onClose}
         />
       )}
 
-      <aside className={[
-        'fixed top-0 left-0 h-full w-64 bg-white dark:bg-[#2D2D2D] border-r border-cream-200 dark:border-stone-700 flex flex-col z-30 transition-transform duration-300',
-        open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
-      ].join(' ')}>
+      <aside
+        className={[
+          'fixed top-0 left-0 h-full w-64 bg-[#111827] flex flex-col z-30 transition-transform duration-300',
+          open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+        ].join(' ')}
+      >
 
-        {/* Logo */}
-        <div className="flex items-center justify-between px-5 py-5 border-b border-cream-200 dark:border-stone-700">
-          <div className="flex items-center gap-2.5">
-            <img src="/sheep-logo.png" alt="SheepTrack" className="w-9 h-9 object-contain" />
-            <span className="font-bold text-stone-900 dark:text-stone-100 text-base tracking-tight">SheepTrack</span>
+        {/* ── Header ─────────────────────────────────────────── */}
+        <div className="flex items-center justify-between px-5 py-5 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <img
+              src="/sheep-logo.png"
+              alt="SheepTrack"
+              className="w-8 h-8 object-contain"
+            />
+            <span className="font-bold text-white text-base tracking-tight leading-none">
+              SheepTrack
+            </span>
           </div>
-          <button onClick={onClose} className="lg:hidden p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:bg-cream-100 dark:hover:bg-[#333333]">
-            <X size={18} />
+          <button
+            onClick={onClose}
+            className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-colors"
+          >
+            <X size={17} />
           </button>
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 overflow-y-auto py-4 px-3 scrollbar-thin">
+        {/* ── Main nav ───────────────────────────────────────── */}
+        <nav className="flex-1 overflow-y-auto px-3 scrollbar-dark">
           <div className="space-y-0.5">
-            {NAV_ITEMS.map(({ to, key, icon: Icon }) => (
-              <NavLink
+            {MAIN_NAV.map(({ to, key, icon }) => (
+              <NavItem
                 key={to}
                 to={to}
-                end={to === '/'}
-                onClick={onClose}
-                className={({ isActive }) => [
-                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-farm-100 dark:bg-farm-900/30 text-farm-600 dark:text-farm-400'
-                    : 'text-stone-500 dark:text-stone-400 hover:bg-cream-100 dark:hover:bg-[#333333] hover:text-stone-800 dark:hover:text-stone-200',
-                ].join(' ')}
-              >
-                {({ isActive }) => (
-                  <>
-                    <Icon size={18} strokeWidth={isActive ? 2.5 : 1.8} />
-                    {t(key)}
-                  </>
-                )}
-              </NavLink>
+                icon={icon}
+                label={t(key)}
+                onClose={onClose}
+              />
             ))}
           </div>
+
+          {/* Divider */}
+          <div className="my-3 border-t border-white/[0.06]" />
+
+          {/* Settings */}
+          <NavItem
+            to="/settings"
+            icon={Settings}
+            label={t('nav.settings')}
+            onClose={onClose}
+          />
         </nav>
 
-        {/* Footer */}
-        <div className="px-5 py-4 border-t border-cream-200 dark:border-stone-700">
+        {/* ── Farm footer ────────────────────────────────────── */}
+        <div className="flex-shrink-0 px-4 py-4 border-t border-white/[0.06]">
           {activeFarm ? (
             <button
               onClick={() => { navigate('/farms'); onClose() }}
-              className="flex items-center gap-2.5 w-full text-left hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2.5 w-full text-left rounded-lg px-2 py-2 -mx-2 hover:bg-white/5 transition-colors group"
             >
               <FarmLogo farm={activeFarm} size="sm" />
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-stone-800 dark:text-stone-200 truncate">{activeFarm.name}</p>
-                <p className="text-xs text-stone-400 dark:text-stone-500">{activeFarm.season}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-slate-200 truncate leading-tight">
+                  {activeFarm.name}
+                </p>
+                <p className="text-xs text-slate-500 group-hover:text-slate-400 transition-colors mt-0.5">
+                  Switch farm
+                </p>
               </div>
             </button>
           ) : (
             <button
               onClick={() => { navigate('/farms'); onClose() }}
-              className="flex items-center gap-2 text-sm text-farm-600 font-medium hover:text-farm-700 transition-colors"
+              className="flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 font-medium transition-colors"
             >
-              <Plus size={15} />
+              <Plus size={15} strokeWidth={2} />
               Create your first farm
             </button>
           )}
         </div>
+
       </aside>
     </>
   )

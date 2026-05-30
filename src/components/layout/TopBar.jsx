@@ -13,7 +13,7 @@ function getInitials(currentUser, authUser) {
 }
 import FarmLogo from '../ui/FarmLogo'
 
-const AVATAR_COLORS = ['bg-farm-400','bg-blue-400','bg-purple-400','bg-amber-500','bg-pink-400']
+const AVATAR_COLORS = ['bg-stone-700','bg-blue-400','bg-violet-500','bg-amber-500','bg-pink-400']
 
 function avatarColor(id = '') {
   const n = parseInt(id.replace(/\D/g, '')) || 0

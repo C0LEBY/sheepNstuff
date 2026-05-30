@@ -3,17 +3,17 @@
 
 /* ── Design tokens ────────────────────────────────────────────── */
 @theme {
-  /* ── Kit Green (replaces farm-*) ──────────────────────────── */
-  --color-farm-50:  #EEF9E6;
-  --color-farm-100: #D4F2B8;
-  --color-farm-200: #ABEA70;
-  --color-farm-300: #82E028;
-  --color-farm-400: #56CA00;
-  --color-farm-500: #44A500;
-  --color-farm-600: #328000;
-  --color-farm-700: #215A00;
-  --color-farm-800: #103500;
-  --color-farm-900: #001000;
+  /* ── Neutral Slate (replaces farm-*) ──────────────────────── */
+  --color-farm-50:  #f8fafc;
+  --color-farm-100: #f1f5f9;
+  --color-farm-200: #e2e8f0;
+  --color-farm-300: #cbd5e1;
+  --color-farm-400: #475569;
+  --color-farm-500: #334155;
+  --color-farm-600: #1e293b;
+  --color-farm-700: #0f172a;
+  --color-farm-800: #0f172a;
+  --color-farm-900: #020617;
 
   /* ── Kit Neutrals (replaces cream-*) ──────────────────────── */
   --color-cream-50:  #FAFAFA;
@@ -53,7 +53,7 @@
   --card-foreground:        oklch(13% 0 0);
   --popover:                oklch(100% 0 0);
   --popover-foreground:     oklch(13% 0 0);
-  --primary:                oklch(64% 0.22 130);
+  --primary:                oklch(35% 0.04 250);
   --primary-foreground:     oklch(99% 0 0);
   --secondary:              oklch(97% 0 0);
   --secondary-foreground:   oklch(20% 0 0);
@@ -65,7 +65,7 @@
   --destructive-foreground: oklch(99% 0 0);
   --border:                 oklch(92% 0 0);
   --input:                  oklch(92% 0 0);
-  --ring:                   oklch(64% 0.22 130);
+  --ring:                   oklch(35% 0.04 250);
   --radius:                 0.75rem;
 
   /* ── Status colours for badges/alerts ───────────────────── */
@@ -75,8 +75,8 @@
   --color-error:   #FF4C51;
 
   /* ── reui component tokens ───────────────────────────────── */
-  --success:             var(--color-farm-400);
-  --success-foreground:  var(--color-farm-900);
+  --success:             var(--color-success);
+  --success-foreground:  oklch(13% 0 0);
   --info:                var(--color-blue-500);
   --info-foreground:     var(--color-blue-900);
   --warning:             var(--color-yellow-500);
@@ -160,6 +160,17 @@ select {
   .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background: #D0D0D0;
+    border-radius: 999px;
+  }
+  /* For always-dark panels (sidebar) */
+  .scrollbar-dark {
+    scrollbar-width: thin;
+    scrollbar-color: #374151 transparent;
+  }
+  .scrollbar-dark::-webkit-scrollbar { width: 5px; }
+  .scrollbar-dark::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-dark::-webkit-scrollbar-thumb {
+    background: #374151;
     border-radius: 999px;
   }
 }

@@ -23,14 +23,14 @@ export default function BottomNav() {
             end={to === '/'}
             className={({ isActive }) => [
               'flex-1 flex flex-col items-center gap-1 pt-3 pb-2 transition-colors',
-              isActive ? 'text-farm-400' : 'text-stone-400 dark:text-stone-500',
+              isActive ? 'text-stone-900 dark:text-stone-100' : 'text-stone-400 dark:text-stone-500',
             ].join(' ')}
           >
             {({ isActive }) => (
               <>
                 <div className={[
                   'w-9 h-7 flex items-center justify-center rounded-full transition-colors',
-                  isActive ? 'bg-farm-100 dark:bg-farm-900/30' : '',
+                  isActive ? 'bg-stone-100 dark:bg-stone-700/50' : '',
                 ].join(' ')}>
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
                 </div>
