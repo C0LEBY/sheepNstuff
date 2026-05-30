@@ -104,7 +104,7 @@ function TaskItem({ task, onToggle, areas }) {
   return (
     <div className={[
       'flex items-start gap-4 p-4 rounded-xl transition-all',
-      task.completed ? 'opacity-50' : isOverdue ? 'bg-red-50 border border-red-100' : isDueToday ? 'bg-amber-50 border border-amber-100' : 'bg-white border border-cream-200',
+      task.completed ? 'opacity-50' : isOverdue ? 'bg-red-50 border border-red-200' : isDueToday ? 'bg-amber-50 border border-amber-200' : 'bg-white border border-cream-200',
     ].join(' ')}>
       {/* Checkbox */}
       <button
@@ -179,7 +179,7 @@ export default function Tasks() {
       />
 
       {/* Category filter */}
-      <div className="flex gap-2 mb-5 overflow-x-auto pb-1">
+      <div className="flex gap-2 mb-5 overflow-x-auto pb-0.5 hide-scrollbar">
         {['All', ...CATEGORIES].map(c => (
           <button
             key={c}

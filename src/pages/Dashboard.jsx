@@ -64,7 +64,7 @@ function StatPill({ label, value, accent, onClick }) {
     <button
       onClick={onClick}
       className={[
-        'flex-shrink-0 sm:flex-1 flex flex-col items-center px-4 pt-3.5 pb-3 rounded-2xl shadow-card text-center hover:opacity-80 transition-opacity min-w-[72px]',
+        'flex-shrink-0 sm:flex-1 flex flex-col items-center px-4 pt-3.5 pb-3 rounded-2xl text-center hover:opacity-80 transition-opacity min-w-[72px]',
         accent ? 'bg-farm-400' : 'bg-white dark:bg-[#2D2D2D]',
       ].join(' ')}
     >
@@ -272,7 +272,7 @@ export default function Dashboard() {
           placeholder={t('dash.searchPlaceholder')}
           value={searchQuery}
           onChange={e => handleSearch(e.target.value)}
-          className="w-full pl-10 pr-10 py-3 text-sm bg-white rounded-2xl shadow-card focus:outline-none focus:ring-2 focus:ring-farm-400"
+          className="w-full pl-10 pr-10 py-3 text-sm bg-white rounded-2xl border border-cream-200 focus:outline-none focus:ring-2 focus:ring-farm-400"
         />
         {searchQuery && (
           <button
@@ -283,7 +283,7 @@ export default function Dashboard() {
           </button>
         )}
         {searchResults.length > 0 && (
-          <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-2xl shadow-card-lg border border-cream-200 z-50 overflow-hidden">
+          <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-2xl border border-cream-200 z-50 overflow-hidden">
             {searchResults.map(s => (
               <button
                 key={s.id}
@@ -366,7 +366,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
         {/* Health status */}
-        <Card>
+        <Card className="shadow-none">
           <CardHeader
             title={t('dash.healthStatus')}
             action={
@@ -436,7 +436,7 @@ export default function Dashboard() {
         </Card>
 
         {/* Tasks */}
-        <Card>
+        <Card className="shadow-none">
           <CardHeader
             title={t('dash.tasksAndReminders')}
             subtitle={`${overdueTasks.length} ${t('dash.overdue')} · ${tasks.filter(tk => !tk.completed).length} ${t('dash.open')}`}
@@ -453,7 +453,7 @@ export default function Dashboard() {
       </div>
 
       {/* ══ 6. Breeding & Lambing ════════════════════════════════ */}
-      <Card>
+      <Card className="shadow-none">
         <CardHeader
           title={t('dash.breedingAndLambing')}
           action={
@@ -518,7 +518,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
         {/* Weight insights */}
-        <Card>
+        <Card className="shadow-none">
           <CardHeader
             title={t('dash.weightAndGrowth')}
             action={
@@ -546,7 +546,7 @@ export default function Dashboard() {
         </Card>
 
         {/* Births & Deaths chart */}
-        <Card>
+        <Card className="shadow-none">
           <CardHeader
             title="Births & Deaths"
             subtitle="Monthly this year"
@@ -573,7 +573,7 @@ export default function Dashboard() {
       </div>
 
       {/* ══ 8. Area occupancy chart ══════════════════════════════ */}
-      <Card>
+      <Card className="shadow-none">
         <CardHeader
           title="Area Occupancy"
           subtitle="Sheep vs capacity"
@@ -604,7 +604,7 @@ export default function Dashboard() {
       </Card>
 
       {/* ══ 9. Sales summary ════════════════════════════════════ */}
-      <Card>
+      <Card className="shadow-none">
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-base font-semibold text-stone-900">{t('page.sales.title')}</h2>
@@ -616,12 +616,12 @@ export default function Dashboard() {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
           {[
-            { label: 'Sales',          val: `R ${incomeYTD.toLocaleString()}`,  sub: `${salesYTD.length} transactions`,      icon: TrendingUp, color: 'text-farm-600 bg-farm-50' },
-            { label: 'Purchases',      val: `R ${spendYTD.toLocaleString()}`,   sub: `${purchasesYTD.length} transactions`,   icon: ShoppingCart, color: 'text-blue-600 bg-blue-50' },
-            { label: 'Net',            val: `R ${(incomeYTD - spendYTD).toLocaleString()}`, sub: 'income minus spend', icon: Activity, color: (incomeYTD - spendYTD) >= 0 ? 'text-farm-600 bg-farm-50' : 'text-red-600 bg-red-50' },
-            { label: 'Last Sale',      val: lastSale ? formatDate(lastSale.date) : '—', sub: lastSale ? `R ${lastSale.totalAmount?.toLocaleString()} · ${lastSale.party}` : 'No sales yet', icon: ShoppingCart, color: 'text-stone-600 bg-stone-50' },
+            { label: 'Sales',          val: `R ${incomeYTD.toLocaleString()}`,  sub: `${salesYTD.length} transactions`,      icon: TrendingUp,  color: 'text-farm-600 bg-farm-50',  border: 'border border-farm-200' },
+            { label: 'Purchases',      val: `R ${spendYTD.toLocaleString()}`,   sub: `${purchasesYTD.length} transactions`,   icon: ShoppingCart, color: 'text-blue-600 bg-blue-50',  border: 'border border-blue-200' },
+            { label: 'Net',            val: `R ${(incomeYTD - spendYTD).toLocaleString()}`, sub: 'income minus spend', icon: Activity, color: (incomeYTD - spendYTD) >= 0 ? 'text-farm-600 bg-farm-50' : 'text-red-600 bg-red-50', border: (incomeYTD - spendYTD) >= 0 ? 'border border-farm-200' : 'border border-red-200' },
+            { label: 'Last Sale',      val: lastSale ? formatDate(lastSale.date) : '—', sub: lastSale ? `R ${lastSale.totalAmount?.toLocaleString()} · ${lastSale.party}` : 'No sales yet', icon: ShoppingCart, color: 'text-stone-600 bg-stone-50', border: 'border border-stone-200' },
           ].map(item => (
-            <div key={item.label} className={`rounded-2xl p-3.5 ${item.color.split(' ')[1]}`}>
+            <div key={item.label} className={`rounded-2xl p-3.5 ${item.color.split(' ')[1]} ${item.border}`}>
               <p className="text-xs text-stone-400 font-medium mb-1">{item.label}</p>
               <p className={`text-base font-bold ${item.color.split(' ')[0]}`}>{item.val}</p>
               <p className="text-xs text-stone-400 mt-0.5 leading-snug">{item.sub}</p>

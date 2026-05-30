@@ -209,13 +209,15 @@ export default function Health() {
 
       {/* Filter */}
       <Card className="mb-5">
-        <div className="flex flex-wrap gap-3 items-center">
-          <p className="text-sm font-medium text-stone-600">Filter by type:</p>
-          <select className={select} value={filterType} onChange={e => setFilterType(e.target.value)}>
+        <div className="sm:flex sm:items-center sm:gap-3">
+          <div className="flex items-center justify-between mb-2 sm:contents">
+            <p className="text-sm font-medium text-stone-600">Filter by type</p>
+            <p className="text-sm text-stone-400 sm:ml-auto">{filtered.length} records</p>
+          </div>
+          <select className={`w-full sm:w-auto ${select}`} value={filterType} onChange={e => setFilterType(e.target.value)}>
             <option value="All">All types</option>
             {TYPES.map(t => <option key={t} value={t}>{t.replace('_', ' ')}</option>)}
           </select>
-          <p className="text-sm text-stone-400 ml-auto">{filtered.length} records</p>
         </div>
       </Card>
 

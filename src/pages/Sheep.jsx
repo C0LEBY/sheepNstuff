@@ -173,8 +173,8 @@ export default function Sheep() {
               key={s}
               onClick={() => setFilterSex(s)}
               className={[
-                'px-3.5 py-1.5 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-colors',
-                filterSex === s ? 'bg-farm-500 text-white' : 'bg-white text-stone-600 shadow-card',
+                'px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap flex-shrink-0 transition-colors',
+                filterSex === s ? 'bg-farm-600 text-white' : 'bg-white text-stone-600 hover:bg-cream-100 shadow-card',
               ].join(' ')}
             >
               {s === 'All' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1) + 's'}
