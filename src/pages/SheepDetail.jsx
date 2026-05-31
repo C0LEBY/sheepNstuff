@@ -57,14 +57,16 @@ export default function SheepDetail() {
   // ── Edit handlers ─────────────────────────────────────────────
   function openEdit() {
     setEditForm({
-      tagNumber:   s.tagNumber,
-      name:        s.name        || '',
-      sex:         s.sex,
-      breed:       s.breed,
-      dateOfBirth: s.dateOfBirth || '',
-      weight:      s.weight      || '',
-      status:      s.status,
-      notes:       s.notes       || '',
+      tagNumber:       s.tagNumber,
+      name:            s.name            || '',
+      sex:             s.sex,
+      breed:           s.breed,
+      dateOfBirth:     s.dateOfBirth     || '',
+      weight:          s.weight          || '',
+      weaningDate:     s.weaningDate     || '',
+      weaningWeightKg: s.weaningWeightKg || '',
+      status:          s.status,
+      notes:           s.notes           || '',
     })
     setEditOpen(true)
   }
@@ -74,8 +76,10 @@ export default function SheepDetail() {
     setSavingEdit(true)
     await updateSheep(s.id, {
       ...editForm,
-      weight:      parseFloat(editForm.weight) || 0,
-      dateOfBirth: editForm.dateOfBirth || null,
+      weight:          parseFloat(editForm.weight)          || 0,
+      weaningWeightKg: parseFloat(editForm.weaningWeightKg) || null,
+      dateOfBirth:     editForm.dateOfBirth  || null,
+      weaningDate:     editForm.weaningDate  || null,
     })
     setSavingEdit(false)
     setEditOpen(false)
@@ -165,6 +169,8 @@ export default function SheepDetail() {
             {infoRow('Age',            getAge(s.dateOfBirth))}
             {infoRow('Current Area',   area?.name)}
             {infoRow('Current Weight', s.weight ? `${s.weight} kg` : null)}
+            {infoRow('Weaning Date',   formatDate(s.weaningDate))}
+            {infoRow('Weaning Weight', s.weaningWeightKg ? `${s.weaningWeightKg} kg` : null)}
             {infoRow('Status',         s.status.charAt(0).toUpperCase() + s.status.slice(1))}
           </div>
         </Card>
@@ -465,9 +471,22 @@ export default function SheepDetail() {
                 onChange={e => setEditForm(f => ({ ...f, dateOfBirth: e.target.value }))} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-stone-500 mb-1">Weight (kg)</label>
+              <label className="block text-xs font-medium text-stone-500 mb-1">Current Weight (kg)</label>
               <input type="number" step="0.1" min="0" className={FIELD} value={editForm.weight || ''}
                 onChange={e => setEditForm(f => ({ ...f, weight: e.target.value }))} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-stone-500 mb-1">Weaning Date</label>
+              <input type="date" className={FIELD} value={editForm.weaningDate || ''}
+                onChange={e => setEditForm(f => ({ ...f, weaningDate: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-stone-500 mb-1">Weaning Weight (kg)</label>
+              <input type="number" step="0.1" min="0" className={FIELD} value={editForm.weaningWeightKg || ''}
+                onChange={e => setEditForm(f => ({ ...f, weaningWeightKg: e.target.value }))} />
             </div>
           </div>
 

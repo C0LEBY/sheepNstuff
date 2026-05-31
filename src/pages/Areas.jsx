@@ -9,8 +9,8 @@ import Button from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
 import PageHeader from '../components/ui/PageHeader'
 
-const TYPES = ['pasture', 'pen', 'camp', 'paddock']
-const TYPE_LABELS = { pasture: 'Pasture', pen: 'Pen', camp: 'Camp', paddock: 'Paddock' }
+const TYPES = ['pasture', 'pen', 'camp', 'paddock', 'feedlot']
+const TYPE_LABELS = { pasture: 'Pasture', pen: 'Pen', camp: 'Camp', paddock: 'Paddock', feedlot: 'Feedlot' }
 
 const FIELD  = 'w-full px-3 py-2.5 text-sm border border-cream-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-farm-400 bg-white'
 const LABEL  = 'block text-sm font-medium text-stone-700 mb-1.5'

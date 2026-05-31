@@ -25,6 +25,8 @@ function AddBirthModal({ open, onClose }) {
     type: 'single',
     notes: '',
     areaId: '',
+    weaningDate: '',
+    avgWeaningWeight: '',
   })
 
   function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
@@ -73,6 +75,8 @@ function AddBirthModal({ open, onClose }) {
       type: form.type,
       stillborns,
       notes: form.notes,
+      weaningDate: form.weaningDate || null,
+      avgWeaningWeight: form.avgWeaningWeight ? parseFloat(form.avgWeaningWeight) : null,
     })
 
     // Update mother status if was pregnant
@@ -139,6 +143,23 @@ function AddBirthModal({ open, onClose }) {
         <div>
           <label className={label}>Notes</label>
           <textarea rows={2} className={field} placeholder="Any observations or notes about this birth…" value={form.notes} onChange={e => set('notes', e.target.value)} />
+        </div>
+
+        {/* Optional weaning info */}
+        <div className="border border-cream-200 rounded-xl overflow-hidden">
+          <div className="px-4 py-2.5 bg-cream-50 border-b border-cream-200">
+            <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide">Weaning Info — optional, fill in later</p>
+          </div>
+          <div className="p-4 grid grid-cols-2 gap-4">
+            <div>
+              <label className={label}>Weaning Date</label>
+              <input type="date" className={field} value={form.weaningDate} onChange={e => set('weaningDate', e.target.value)} />
+            </div>
+            <div>
+              <label className={label}>Avg Weaning Weight (kg)</label>
+              <input type="number" step="0.1" min="0" className={field} placeholder="e.g. 18.5" value={form.avgWeaningWeight} onChange={e => set('avgWeaningWeight', e.target.value)} />
+            </div>
+          </div>
         </div>
 
         <div className="bg-cream-50 border border-cream-200 rounded-xl px-4 py-3 text-sm text-stone-600">

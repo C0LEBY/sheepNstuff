@@ -19,6 +19,9 @@ function AddTransactionModal({ open, onClose, defaultType = 'sale' }) {
     date: new Date().toISOString().split('T')[0],
     count: '1',
     pricePerHead: '',
+    saleType: '',
+    weightKg: '',
+    pricePerKg: '',
     party: '',
     notes: '',
   })
@@ -26,6 +29,7 @@ function AddTransactionModal({ open, onClose, defaultType = 'sale' }) {
   function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
 
   const total = (parseInt(form.count) || 0) * (parseFloat(form.pricePerHead) || 0)
+  const slaughterTotal = (parseFloat(form.weightKg) || 0) * (parseFloat(form.pricePerKg) || 0)
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -36,11 +40,14 @@ function AddTransactionModal({ open, onClose, defaultType = 'sale' }) {
       count: parseInt(form.count) || 1,
       pricePerHead: parseFloat(form.pricePerHead) || 0,
       totalAmount: total,
+      saleType: form.saleType || null,
+      weightKg: form.weightKg ? parseFloat(form.weightKg) : null,
+      pricePerKg: form.pricePerKg ? parseFloat(form.pricePerKg) : null,
       party: form.party,
       notes: form.notes,
     })
     onClose()
-    setForm({ type: defaultType, date: new Date().toISOString().split('T')[0], count: '1', pricePerHead: '', party: '', notes: '' })
+    setForm({ type: defaultType, date: new Date().toISOString().split('T')[0], count: '1', pricePerHead: '', saleType: '', weightKg: '', pricePerKg: '', party: '', notes: '' })
   }
 
   const field = 'w-full px-3 py-2.5 text-sm border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-farm-400 bg-white'
@@ -66,6 +73,22 @@ function AddTransactionModal({ open, onClose, defaultType = 'sale' }) {
           <input required type="date" className={field} value={form.date} onChange={e => set('date', e.target.value)} />
         </div>
 
+        {/* Sale type — only show for sales */}
+        {form.type === 'sale' && (
+          <div>
+            <label className={label}>Sale Type</label>
+            <select className={field} value={form.saleType} onChange={e => set('saleType', e.target.value)}>
+              <option value="">Select type…</option>
+              <option value="slaughter">Slaughter</option>
+              <option value="store">Store Lambs</option>
+              <option value="breeding">Breeding Stock</option>
+              <option value="culled">Culled</option>
+              <option value="private">Private Sale</option>
+              <option value="auction">Auction</option>
+            </select>
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className={label}>Number of Sheep *</label>
@@ -77,9 +100,26 @@ function AddTransactionModal({ open, onClose, defaultType = 'sale' }) {
           </div>
         </div>
 
+        {/* Slaughter-specific fields */}
+        {form.type === 'sale' && form.saleType === 'slaughter' && (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={label}>Total Live Weight (kg)</label>
+              <input type="number" step="0.1" min="0" className={field} placeholder="e.g. 480" value={form.weightKg} onChange={e => set('weightKg', e.target.value)} />
+            </div>
+            <div>
+              <label className={label}>Price per kg (R/kg)</label>
+              <input type="number" step="0.01" min="0" className={field} placeholder="e.g. 85.00" value={form.pricePerKg} onChange={e => set('pricePerKg', e.target.value)} />
+            </div>
+          </div>
+        )}
+
         {total > 0 && (
-          <div className="bg-farm-50 border border-farm-200 rounded-xl px-4 py-3 text-sm text-farm-800">
-            Total: <strong>R {total.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</strong>
+          <div className="bg-farm-50 border border-farm-200 rounded-xl px-4 py-3 text-sm text-farm-800 space-y-1">
+            <div>Total (per head): <strong>R {total.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</strong></div>
+            {slaughterTotal > 0 && (
+              <div className="text-farm-600">Total (by weight): <strong>R {slaughterTotal.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</strong></div>
+            )}
           </div>
         )}
 
@@ -170,6 +210,7 @@ export default function Sales() {
                 <TableHead className="text-left px-5 py-3 font-semibold">Type</TableHead>
                 <TableHead className="text-left px-5 py-3 font-semibold">Count</TableHead>
                 <TableHead className="text-left px-5 py-3 font-semibold">Price / Head</TableHead>
+                <TableHead className="text-left px-5 py-3 font-semibold">R/kg</TableHead>
                 <TableHead className="text-left px-5 py-3 font-semibold">Total</TableHead>
                 <TableHead className="text-left px-5 py-3 font-semibold">Party</TableHead>
                 <TableHead className="text-left px-5 py-3 font-semibold">Notes</TableHead>
@@ -179,12 +220,20 @@ export default function Sales() {
               {sorted.map(tx => (
                 <TableRow key={tx.id} className="hover:bg-cream-50">
                   <TableCell className="px-5 py-3 text-stone-700 whitespace-nowrap">{formatDate(tx.date)}</TableCell>
-                  <TableCell className="px-5 py-3"><Badge variant={tx.type}>{tx.type}</Badge></TableCell>
+                  <TableCell className="px-5 py-3">
+                    <div className="flex items-center gap-1.5">
+                      <Badge variant={tx.type}>{tx.type}</Badge>
+                      {tx.saleType && <span className="text-xs text-stone-400">{tx.saleType}</span>}
+                    </div>
+                  </TableCell>
                   <TableCell className="px-5 py-3 font-semibold text-stone-900">{tx.count}</TableCell>
-                  <TableCell className="px-5 py-3 text-stone-700">R {tx.pricePerHead.toLocaleString()}</TableCell>
+                  <TableCell className="px-5 py-3 text-stone-700">R {(tx.pricePerHead || 0).toLocaleString()}</TableCell>
+                  <TableCell className="px-5 py-3 text-stone-500 text-sm">
+                    {tx.pricePerKg ? `R ${tx.pricePerKg}/kg` : <span className="text-stone-300">—</span>}
+                  </TableCell>
                   <TableCell className="px-5 py-3">
                     <span className={`font-semibold ${tx.type === 'sale' ? 'text-farm-700' : 'text-red-600'}`}>
-                      {tx.type === 'purchase' ? '–' : '+'}R {tx.totalAmount.toLocaleString()}
+                      {tx.type === 'purchase' ? '–' : '+'}R {(tx.totalAmount || 0).toLocaleString()}
                     </span>
                   </TableCell>
                   <TableCell className="px-5 py-3 text-stone-700">{tx.party}</TableCell>

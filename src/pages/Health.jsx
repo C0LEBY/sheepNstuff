@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, HeartPulse, AlertCircle, Calendar } from 'lucide-react'
+import { Plus, HeartPulse, AlertCircle, Calendar, Skull } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { useFarm } from '../context/FarmContext'
 import { formatDate } from '../lib/utils'
@@ -12,6 +12,98 @@ import EmptyState from '../components/ui/EmptyState'
 
 const TYPES = ['vaccination', 'deworming', 'treatment', 'injury', 'illness', 'checkup', 'vet_visit']
 
+const DEATH_CAUSES = [
+  { value: 'disease',             label: 'Disease / Illness' },
+  { value: 'predators',           label: 'Predators' },
+  { value: 'theft',               label: 'Theft' },
+  { value: 'birth_complications', label: 'Birth Complications' },
+  { value: 'old_age',             label: 'Old Age' },
+  { value: 'injury',              label: 'Injury / Accident' },
+  { value: 'unknown',             label: 'Unknown' },
+]
+
+const CAUSE_COLORS = {
+  disease:             'bg-orange-100 text-orange-700',
+  predators:           'bg-red-100 text-red-700',
+  theft:               'bg-purple-100 text-purple-700',
+  birth_complications: 'bg-pink-100 text-pink-700',
+  old_age:             'bg-stone-100 text-stone-600',
+  injury:              'bg-amber-100 text-amber-700',
+  unknown:             'bg-slate-100 text-slate-600',
+}
+
+/* ── Add Death Modal ─────────────────────────────────────────────── */
+function AddDeathModal({ open, onClose }) {
+  const { sheep, addDeath } = useFarm()
+  const activeSheep = sheep.filter(s => s.status !== 'sold' && s.status !== 'dead')
+
+  const [form, setForm] = useState({
+    sheepId: '',
+    date: new Date().toISOString().split('T')[0],
+    cause: 'unknown',
+    notes: '',
+  })
+
+  function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    await addDeath({
+      sheepId: form.sheepId,
+      date: form.date,
+      cause: form.cause,
+      notes: form.notes || null,
+    })
+    setForm({ sheepId: '', date: new Date().toISOString().split('T')[0], cause: 'unknown', notes: '' })
+    onClose()
+  }
+
+  const field = 'w-full px-3 py-2.5 text-sm border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-farm-400 bg-white'
+  const label = 'block text-sm font-medium text-stone-700 mb-1'
+
+  return (
+    <Modal open={open} onClose={onClose} title="Record Death" size="sm">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className={label}>Sheep *</label>
+          <select required className={field} value={form.sheepId} onChange={e => set('sheepId', e.target.value)}>
+            <option value="">Select sheep…</option>
+            {activeSheep.map(s => (
+              <option key={s.id} value={s.id}>{s.tagNumber}{s.name ? ` — ${s.name}` : ''} ({s.sex})</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={label}>Date *</label>
+            <input required type="date" className={field} value={form.date} onChange={e => set('date', e.target.value)} />
+          </div>
+          <div>
+            <label className={label}>Cause</label>
+            <select className={field} value={form.cause} onChange={e => set('cause', e.target.value)}>
+              {DEATH_CAUSES.map(c => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label className={label}>Notes</label>
+          <textarea rows={2} className={field} placeholder="Any observations or details…" value={form.notes} onChange={e => set('notes', e.target.value)} />
+        </div>
+
+        <div className="flex justify-end gap-3 pt-1">
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button type="submit" className="!bg-red-500 hover:!bg-red-600">Record Death</Button>
+        </div>
+      </form>
+    </Modal>
+  )
+}
+
+/* ── Add Treatment Modal ─────────────────────────────────────────── */
 function AddTreatmentModal({ open, onClose }) {
   const { sheep, addHealthRecord } = useFarm()
   const activeSheep = sheep.filter(s => s.status !== 'sold' && s.status !== 'dead')
@@ -148,9 +240,10 @@ function AddTreatmentModal({ open, onClose }) {
 }
 
 export default function Health() {
-  const { healthRecords, sheep } = useFarm()
+  const { healthRecords, sheep, deaths } = useFarm()
   const [searchParams] = useSearchParams()
-  const [addOpen, setAddOpen] = useState(false)
+  const [addOpen, setAddOpen]       = useState(false)
+  const [deathOpen, setDeathOpen]   = useState(false)
   const [filterType, setFilterType] = useState('All')
 
   useEffect(() => {
@@ -163,14 +256,24 @@ export default function Health() {
   const upcoming = sorted.filter(h => h.followUpDate && new Date(h.followUpDate) > new Date() && new Date(h.followUpDate) < new Date(Date.now() + 14 * 86400000))
   const overdue  = sorted.filter(h => h.followUpDate && new Date(h.followUpDate) < new Date())
 
+  const recentDeaths = [...deaths].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10)
+
   const select = 'text-sm border border-cream-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-farm-400'
 
   return (
     <div className="max-w-5xl mx-auto">
       <PageHeader
         title="Health & Treatments"
-        subtitle={`${healthRecords.length} records`}
-        action={<Button onClick={() => setAddOpen(true)} icon={<Plus size={16} />}>Record Treatment</Button>}
+        subtitle={`${healthRecords.length} records · ${deaths.length} deaths`}
+        action={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setDeathOpen(true)} icon={<Skull size={15} />}
+              className="!border-red-200 !text-red-600 hover:!bg-red-50">
+              Record Death
+            </Button>
+            <Button onClick={() => setAddOpen(true)} icon={<Plus size={16} />}>Record Treatment</Button>
+          </div>
+        }
       />
 
       {/* Alert: overdue follow-ups */}
@@ -222,7 +325,7 @@ export default function Health() {
       </Card>
 
       {filtered.length === 0 ? (
-        <Card>
+        <Card className="mb-5">
           <EmptyState
             icon={HeartPulse}
             title="No health records"
@@ -231,7 +334,7 @@ export default function Health() {
           />
         </Card>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3 mb-6">
           {filtered.map(h => {
             const s = sheep.find(x => x.id === h.sheepId)
             const isFollowUpOverdue = h.followUpDate && new Date(h.followUpDate) < new Date()
@@ -269,7 +372,46 @@ export default function Health() {
         </div>
       )}
 
-      <AddTreatmentModal open={addOpen} onClose={() => setAddOpen(false)} />
+      {/* Deaths section */}
+      {recentDeaths.length > 0 && (
+        <div>
+          <h2 className="text-base font-semibold text-stone-800 mb-3 flex items-center gap-2">
+            <Skull size={16} className="text-stone-400" />
+            Deaths ({deaths.length})
+          </h2>
+          <div className="space-y-2">
+            {recentDeaths.map(d => {
+              const s = sheep.find(x => x.id === d.sheepId)
+              const causeLabel = DEATH_CAUSES.find(c => c.value === d.cause)?.label || d.cause || 'Unknown'
+              const causeColor = CAUSE_COLORS[d.cause] || 'bg-stone-100 text-stone-600'
+              return (
+                <Card key={d.id} className="hover:shadow-card-hover transition-shadow">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Skull size={16} className="text-red-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-semibold text-stone-900 text-sm">
+                          {s ? `${s.tagNumber}${s.name ? ` — ${s.name}` : ''}` : 'Unknown sheep'}
+                        </p>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${causeColor}`}>
+                          {causeLabel}
+                        </span>
+                      </div>
+                      {d.notes && <p className="text-xs text-stone-500 mt-0.5">{d.notes}</p>}
+                    </div>
+                    <span className="text-xs text-stone-400 flex-shrink-0">{formatDate(d.date)}</span>
+                  </div>
+                </Card>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      <AddTreatmentModal open={addOpen}  onClose={() => setAddOpen(false)} />
+      <AddDeathModal     open={deathOpen} onClose={() => setDeathOpen(false)} />
     </div>
   )
 }

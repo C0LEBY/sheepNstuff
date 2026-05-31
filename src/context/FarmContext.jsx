@@ -193,6 +193,21 @@ export function FarmProvider({ children }) {
     showToast('Birth recorded successfully')
   }
 
+  /* ── deaths ──────────────────────────────────────────────── */
+  async function addDeath(deathData) {
+    const { data, error } = await supabase
+      .from('deaths')
+      .insert({ ...toDb(deathData), farm_id: activeFarmId })
+      .select().single()
+    if (error) { showToast('Failed to record death', 'error'); return }
+    setDeaths(prev => [mapRow(data), ...prev])
+    // Auto-mark sheep as dead (removes from area via updateSheep logic)
+    if (deathData.sheepId) {
+      await updateSheep(deathData.sheepId, { status: 'dead' })
+    }
+    showToast('Death recorded')
+  }
+
   /* ── health records ───────────────────────────────────────── */
   async function addHealthRecord(record) {
     const { data, error } = await supabase
@@ -276,6 +291,7 @@ export function FarmProvider({ children }) {
       addArea, updateArea, deleteArea,
       addGroup, updateGroup, deleteGroup, assignGroupToArea,
       addBirth,
+      addDeath,
       addHealthRecord,
       addBreedingRecord,
       addTransaction,

@@ -63,6 +63,15 @@ const en = {
   'status.dead':     'Dead',
   'status.missing':  'Missing',
 
+  // ── Death causes ────────────────────────────────────────────
+  'death.cause.disease':             'Disease / Illness',
+  'death.cause.predators':           'Predators',
+  'death.cause.theft':               'Theft',
+  'death.cause.birthComplications':  'Birth Complications',
+  'death.cause.oldAge':              'Old Age',
+  'death.cause.injury':              'Injury / Accident',
+  'death.cause.unknown':             'Unknown',
+
   // ── Dashboard ───────────────────────────────────────────────
   'dash.welcomeBack':         'Welcome back',
   'dash.searchPlaceholder':   'Search sheep by tag, name or breed…',
@@ -219,6 +228,15 @@ const af = {
   'status.sold':     'Verkoop',
   'status.dead':     'Dood',
   'status.missing':  'Vermis',
+
+  // ── Doodsoorsake ────────────────────────────────────────────
+  'death.cause.disease':             'Siekte',
+  'death.cause.predators':           'Roofdiere',
+  'death.cause.theft':               'Diefstal',
+  'death.cause.birthComplications':  'Geboortekomplikasies',
+  'death.cause.oldAge':              'Ouderdom',
+  'death.cause.injury':              'Besering / Ongeluk',
+  'death.cause.unknown':             'Onbekend',
 
   // ── Paneelbord ──────────────────────────────────────────────
   'dash.welcomeBack':         'Welkom terug',
