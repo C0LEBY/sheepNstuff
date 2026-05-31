@@ -18,6 +18,8 @@ export function FarmProvider({ children }) {
   const [deaths,          setDeaths]          = useState([])
   const [pregnancyScans,  setPregnancyScans]  = useState([])
   const [feedlotEntries,  setFeedlotEntries]  = useState([])
+  const [feedRecords,     setFeedRecords]     = useState([])
+  const [staffAllotments, setStaffAllotments] = useState([])
   const [loading,         setLoading]         = useState(false)
   const [toast,           setToast]           = useState(null)
 
@@ -28,6 +30,7 @@ export function FarmProvider({ children }) {
       setHealthRecords([]); setBreedingRecords([])
       setTransactions([]); setTasks([]); setDeaths([])
       setPregnancyScans([]); setFeedlotEntries([])
+      setFeedRecords([]); setStaffAllotments([])
       return
     }
     setLoading(true)
@@ -43,6 +46,8 @@ export function FarmProvider({ children }) {
       { data: deathRows },
       { data: scanRows },
       { data: feedlotRows },
+      { data: feedRows },
+      { data: allotmentRows },
     ] = await Promise.all([
       supabase.from('sheep').select('*').eq('farm_id', farmId).order('tag_number'),
       supabase.from('areas').select('*').eq('farm_id', farmId).order('name'),
@@ -55,6 +60,8 @@ export function FarmProvider({ children }) {
       supabase.from('deaths').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
       supabase.from('pregnancy_scans').select('*').eq('farm_id', farmId).order('scan_date', { ascending: false }),
       supabase.from('feedlot_entries').select('*').eq('farm_id', farmId).order('entry_date', { ascending: false }),
+      supabase.from('feed_records').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
+      supabase.from('staff_allotments').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
     ])
     setSheep(mapRows(sheepRows))
     setAreas(mapRows(areaRows))
@@ -67,6 +74,8 @@ export function FarmProvider({ children }) {
     setDeaths(mapRows(deathRows))
     setPregnancyScans(mapRows(scanRows || []))
     setFeedlotEntries(mapRows(feedlotRows || []))
+    setFeedRecords(mapRows(feedRows || []))
+    setStaffAllotments(mapRows(allotmentRows || []))
     setLoading(false)
   }, [])
 
@@ -202,6 +211,28 @@ export function FarmProvider({ children }) {
     showToast('Birth recorded successfully')
   }
 
+  /* ── feed records ────────────────────────────────────────── */
+  async function addFeedRecord(recordData) {
+    const { data, error } = await supabase
+      .from('feed_records')
+      .insert({ ...toDb(recordData), farm_id: activeFarmId })
+      .select().single()
+    if (error) { showToast('Failed to save feed record', 'error'); return }
+    setFeedRecords(prev => [mapRow(data), ...prev])
+    showToast('Feed record saved')
+  }
+
+  /* ── staff allotments ─────────────────────────────────────── */
+  async function addStaffAllotment(allotmentData) {
+    const { data, error } = await supabase
+      .from('staff_allotments')
+      .insert({ ...toDb(allotmentData), farm_id: activeFarmId })
+      .select().single()
+    if (error) { showToast('Failed to save allotment', 'error'); return }
+    setStaffAllotments(prev => [mapRow(data), ...prev])
+    showToast('Staff allotment recorded')
+  }
+
   /* ── pregnancy scans ─────────────────────────────────────── */
   async function addPregnancyScan(scanData) {
     const { data, error } = await supabase
@@ -328,6 +359,7 @@ export function FarmProvider({ children }) {
       sheep, activeSheep, areas, groups, births, healthRecords,
       breedingRecords, transactions, tasks, deaths,
       pregnancyScans, feedlotEntries,
+      feedRecords, staffAllotments,
       weightHistory, stats, loading, toast,
       addSheep, updateSheep, deleteSheep,
       addArea, updateArea, deleteArea,
@@ -336,6 +368,8 @@ export function FarmProvider({ children }) {
       addDeath,
       addPregnancyScan,
       addFeedlotEntry, updateFeedlotEntry,
+      addFeedRecord,
+      addStaffAllotment,
       addHealthRecord,
       addBreedingRecord,
       addTransaction,
