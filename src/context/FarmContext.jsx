@@ -16,6 +16,8 @@ export function FarmProvider({ children }) {
   const [transactions,    setTransactions]    = useState([])
   const [tasks,           setTasks]           = useState([])
   const [deaths,          setDeaths]          = useState([])
+  const [pregnancyScans,  setPregnancyScans]  = useState([])
+  const [feedlotEntries,  setFeedlotEntries]  = useState([])
   const [loading,         setLoading]         = useState(false)
   const [toast,           setToast]           = useState(null)
 
@@ -25,6 +27,7 @@ export function FarmProvider({ children }) {
       setSheep([]); setAreas([]); setGroups([]); setBirths([])
       setHealthRecords([]); setBreedingRecords([])
       setTransactions([]); setTasks([]); setDeaths([])
+      setPregnancyScans([]); setFeedlotEntries([])
       return
     }
     setLoading(true)
@@ -38,6 +41,8 @@ export function FarmProvider({ children }) {
       { data: txRows },
       { data: taskRows },
       { data: deathRows },
+      { data: scanRows },
+      { data: feedlotRows },
     ] = await Promise.all([
       supabase.from('sheep').select('*').eq('farm_id', farmId).order('tag_number'),
       supabase.from('areas').select('*').eq('farm_id', farmId).order('name'),
@@ -48,6 +53,8 @@ export function FarmProvider({ children }) {
       supabase.from('transactions').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
       supabase.from('tasks').select('*').eq('farm_id', farmId).order('due_date'),
       supabase.from('deaths').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
+      supabase.from('pregnancy_scans').select('*').eq('farm_id', farmId).order('scan_date', { ascending: false }),
+      supabase.from('feedlot_entries').select('*').eq('farm_id', farmId).order('entry_date', { ascending: false }),
     ])
     setSheep(mapRows(sheepRows))
     setAreas(mapRows(areaRows))
@@ -58,6 +65,8 @@ export function FarmProvider({ children }) {
     setTransactions(mapRows(txRows))
     setTasks(mapRows(taskRows))
     setDeaths(mapRows(deathRows))
+    setPregnancyScans(mapRows(scanRows || []))
+    setFeedlotEntries(mapRows(feedlotRows || []))
     setLoading(false)
   }, [])
 
@@ -193,6 +202,38 @@ export function FarmProvider({ children }) {
     showToast('Birth recorded successfully')
   }
 
+  /* ── pregnancy scans ─────────────────────────────────────── */
+  async function addPregnancyScan(scanData) {
+    const { data, error } = await supabase
+      .from('pregnancy_scans')
+      .insert({ ...toDb(scanData), farm_id: activeFarmId })
+      .select().single()
+    if (error) { showToast('Failed to record scan', 'error'); return }
+    setPregnancyScans(prev => [mapRow(data), ...prev])
+    showToast('Pregnancy scan recorded')
+  }
+
+  /* ── feedlot entries ──────────────────────────────────────── */
+  async function addFeedlotEntry(entryData) {
+    const { data, error } = await supabase
+      .from('feedlot_entries')
+      .insert({ ...toDb(entryData), farm_id: activeFarmId })
+      .select().single()
+    if (error) { showToast('Failed to record feedlot entry', 'error'); return null }
+    const entry = mapRow(data)
+    setFeedlotEntries(prev => [entry, ...prev])
+    showToast('Transferred to feedlot')
+    return entry
+  }
+
+  async function updateFeedlotEntry(id, updates) {
+    const { data, error } = await supabase
+      .from('feedlot_entries').update(toDb(updates)).eq('id', id).select().single()
+    if (error) { showToast('Failed to update feedlot entry', 'error'); return }
+    setFeedlotEntries(prev => prev.map(e => e.id === id ? mapRow(data) : e))
+    showToast('Feedlot entry updated')
+  }
+
   /* ── deaths ──────────────────────────────────────────────── */
   async function addDeath(deathData) {
     const { data, error } = await supabase
@@ -286,12 +327,15 @@ export function FarmProvider({ children }) {
     <FarmContext.Provider value={{
       sheep, activeSheep, areas, groups, births, healthRecords,
       breedingRecords, transactions, tasks, deaths,
+      pregnancyScans, feedlotEntries,
       weightHistory, stats, loading, toast,
       addSheep, updateSheep, deleteSheep,
       addArea, updateArea, deleteArea,
       addGroup, updateGroup, deleteGroup, assignGroupToArea,
       addBirth,
       addDeath,
+      addPregnancyScan,
+      addFeedlotEntry, updateFeedlotEntry,
       addHealthRecord,
       addBreedingRecord,
       addTransaction,

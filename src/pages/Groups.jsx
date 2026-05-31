@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Layers2, Plus, ChevronRight, MapPin, Tag, Trash2,
-  X, Check, Pencil, Users, ArrowRight,
+  X, Check, Pencil, Users, ArrowRight, Microscope, Warehouse,
 } from 'lucide-react'
 import { useFarm }     from '../context/FarmContext'
 import { useLanguage } from '../context/LanguageContext'
@@ -216,11 +216,27 @@ function CreateGroupModal({ areas, onSave, onClose }) {
 }
 
 /* ── Group Card ────────────────────────────────────────────────── */
-function GroupCard({ group, sheep, areas, onSelect, selected, onDelete, onAssignArea }) {
-  const groupSheep = sheep.filter(s => s.groupId === group.id)
-  const area       = areas.find(a => a.id === group.areaId)
+function GroupCard({ group, sheep, areas, pregnancyScans, feedlotEntries, onSelect, selected, onDelete, onAssignArea, onAddFeedlotEntry, onUpdateFeedlotEntry }) {
+  const groupSheep    = sheep.filter(s => s.groupId === group.id)
+  const area          = areas.find(a => a.id === group.areaId)
+  const feedlotAreas  = areas.filter(a => a.type === 'feedlot')
+
+  // Latest scan for this group
+  const latestScan = pregnancyScans
+    .filter(s => s.groupId === group.id)
+    .sort((a, b) => new Date(b.scanDate) - new Date(a.scanDate))[0]
+
+  // Active feedlot entry (no exit date)
+  const activeFeedlot = feedlotEntries
+    .filter(e => e.groupId === group.id && !e.exitDate)
+    .sort((a, b) => new Date(b.entryDate) - new Date(a.entryDate))[0]
+
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [areaOpen, setAreaOpen]           = useState(false)
+  const [feedlotOpen, setFeedlotOpen]     = useState(false)
+  const [exitOpen, setExitOpen]           = useState(false)
+  const [feedlotForm, setFeedlotForm]     = useState({ entryDate: new Date().toISOString().split('T')[0], sheepCount: '', avgWeightKg: '', areaId: '', notes: '' })
+  const [exitForm, setExitForm]           = useState({ exitDate: new Date().toISOString().split('T')[0], exitWeightKg: '' })
 
   return (
     <div className={[
@@ -262,7 +278,7 @@ function GroupCard({ group, sheep, areas, onSelect, selected, onDelete, onAssign
         <div className="border-t border-cream-100 dark:border-stone-700 px-5 pb-5">
 
           {/* Actions */}
-          <div className="flex items-center gap-2 pt-4 pb-3">
+          <div className="flex items-center gap-2 pt-4 pb-3 flex-wrap">
             {/* Assign area */}
             <div className="relative">
               <button
@@ -293,6 +309,25 @@ function GroupCard({ group, sheep, areas, onSelect, selected, onDelete, onAssign
               )}
             </div>
 
+            {/* Feedlot button */}
+            {!activeFeedlot ? (
+              feedlotAreas.length > 0 && (
+                <button
+                  onClick={() => { setFeedlotOpen(o => !o); setExitOpen(false) }}
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
+                >
+                  <Warehouse size={12} /> Transfer to feedlot
+                </button>
+              )
+            ) : (
+              <button
+                onClick={() => { setExitOpen(o => !o); setFeedlotOpen(false) }}
+                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl bg-amber-500 text-white hover:bg-amber-600 transition-colors"
+              >
+                <Warehouse size={12} /> In feedlot · Exit
+              </button>
+            )}
+
             {/* Delete */}
             <button
               onClick={() => confirmDelete ? onDelete(group.id) : setConfirmDelete(true)}
@@ -309,6 +344,105 @@ function GroupCard({ group, sheep, areas, onSelect, selected, onDelete, onAssign
             </button>
           </div>
 
+          {/* Feedlot entry inline form */}
+          {feedlotOpen && !activeFeedlot && (
+            <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30 rounded-2xl p-4 mb-3 space-y-3">
+              <p className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wide">Transfer to Feedlot</p>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 mb-1">Entry Date</label>
+                  <input type="date" value={feedlotForm.entryDate}
+                    onChange={e => setFeedlotForm(f => ({ ...f, entryDate: e.target.value }))}
+                    className="w-full px-2.5 py-2 text-xs border border-cream-300 dark:border-stone-600 rounded-lg bg-white dark:bg-[#333] focus:outline-none focus:ring-2 focus:ring-farm-400" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 mb-1">Count</label>
+                  <input type="number" min="1" placeholder={groupSheep.length || '0'} value={feedlotForm.sheepCount}
+                    onChange={e => setFeedlotForm(f => ({ ...f, sheepCount: e.target.value }))}
+                    className="w-full px-2.5 py-2 text-xs border border-cream-300 dark:border-stone-600 rounded-lg bg-white dark:bg-[#333] focus:outline-none focus:ring-2 focus:ring-farm-400" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 mb-1">Avg Weight (kg)</label>
+                  <input type="number" step="0.1" min="0" placeholder="e.g. 22" value={feedlotForm.avgWeightKg}
+                    onChange={e => setFeedlotForm(f => ({ ...f, avgWeightKg: e.target.value }))}
+                    className="w-full px-2.5 py-2 text-xs border border-cream-300 dark:border-stone-600 rounded-lg bg-white dark:bg-[#333] focus:outline-none focus:ring-2 focus:ring-farm-400" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 mb-1">Feedlot Area</label>
+                  <select value={feedlotForm.areaId}
+                    onChange={e => setFeedlotForm(f => ({ ...f, areaId: e.target.value }))}
+                    className="w-full px-2.5 py-2 text-xs border border-cream-300 dark:border-stone-600 rounded-lg bg-white dark:bg-[#333] focus:outline-none focus:ring-2 focus:ring-farm-400">
+                    <option value="">Select feedlot…</option>
+                    {feedlotAreas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => setFeedlotOpen(false)}
+                  className="flex-1 py-2 text-xs font-semibold rounded-xl border border-cream-300 dark:border-stone-600 text-stone-500 hover:bg-cream-100 dark:hover:bg-stone-700 transition-colors">
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    await onAddFeedlotEntry({
+                      groupId:     group.id,
+                      areaId:      feedlotForm.areaId  || null,
+                      entryDate:   feedlotForm.entryDate,
+                      sheepCount:  parseInt(feedlotForm.sheepCount) || groupSheep.length,
+                      avgWeightKg: feedlotForm.avgWeightKg ? parseFloat(feedlotForm.avgWeightKg) : null,
+                      notes:       feedlotForm.notes || null,
+                    })
+                    setFeedlotOpen(false)
+                    setFeedlotForm({ entryDate: new Date().toISOString().split('T')[0], sheepCount: '', avgWeightKg: '', areaId: '', notes: '' })
+                  }}
+                  className="flex-1 py-2 text-xs font-semibold rounded-xl bg-amber-500 hover:bg-amber-600 text-white transition-colors">
+                  Confirm Transfer
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Exit feedlot inline form */}
+          {exitOpen && activeFeedlot && (
+            <div className="bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-2xl p-4 mb-3 space-y-3">
+              <p className="text-xs font-bold text-stone-600 dark:text-stone-400 uppercase tracking-wide">
+                Exit Feedlot · Entered {formatDate(activeFeedlot.entryDate)} · {activeFeedlot.sheepCount} sheep
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 mb-1">Exit Date</label>
+                  <input type="date" value={exitForm.exitDate}
+                    onChange={e => setExitForm(f => ({ ...f, exitDate: e.target.value }))}
+                    className="w-full px-2.5 py-2 text-xs border border-cream-300 dark:border-stone-600 rounded-lg bg-white dark:bg-[#333] focus:outline-none focus:ring-2 focus:ring-farm-400" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 mb-1">Exit Avg Weight (kg)</label>
+                  <input type="number" step="0.1" min="0" placeholder="e.g. 38" value={exitForm.exitWeightKg}
+                    onChange={e => setExitForm(f => ({ ...f, exitWeightKg: e.target.value }))}
+                    className="w-full px-2.5 py-2 text-xs border border-cream-300 dark:border-stone-600 rounded-lg bg-white dark:bg-[#333] focus:outline-none focus:ring-2 focus:ring-farm-400" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => setExitOpen(false)}
+                  className="flex-1 py-2 text-xs font-semibold rounded-xl border border-cream-300 dark:border-stone-600 text-stone-500 hover:bg-cream-100 dark:hover:bg-stone-700 transition-colors">
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    await onUpdateFeedlotEntry(activeFeedlot.id, {
+                      exitDate:      exitForm.exitDate,
+                      exitWeightKg:  exitForm.exitWeightKg ? parseFloat(exitForm.exitWeightKg) : null,
+                    })
+                    setExitOpen(false)
+                    setExitForm({ exitDate: new Date().toISOString().split('T')[0], exitWeightKg: '' })
+                  }}
+                  className="flex-1 py-2 text-xs font-semibold rounded-xl bg-stone-700 hover:bg-stone-800 text-white transition-colors">
+                  Record Exit
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Sheep list */}
           {groupSheep.length === 0 ? (
             <p className="text-sm text-stone-400 dark:text-stone-500 py-4 text-center">No sheep in this group</p>
@@ -317,6 +451,27 @@ function GroupCard({ group, sheep, areas, onSelect, selected, onDelete, onAssign
               {groupSheep.map(s => (
                 <SheepRow key={s.id} sheep={s} area={areas.find(a => a.id === s.areaId)} />
               ))}
+            </div>
+          )}
+
+          {/* Latest pregnancy scan */}
+          {latestScan && (
+            <div className="mt-3 pt-3 border-t border-cream-100 dark:border-stone-700">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Microscope size={12} className="text-blue-500" />
+                <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Latest Scan — {formatDate(latestScan.scanDate)}</p>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {latestScan.ewesScanned > 0 && (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">
+                    {Math.round(((latestScan.ewesScanned - latestScan.dry) / latestScan.ewesScanned) * 100)}% pregnant
+                  </span>
+                )}
+                {latestScan.singles  > 0 && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">{latestScan.singles} singles</span>}
+                {latestScan.twins    > 0 && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{latestScan.twins} twins</span>}
+                {latestScan.triplets > 0 && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">{latestScan.triplets} triplets</span>}
+                {latestScan.dry      > 0 && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-stone-100 text-stone-500">{latestScan.dry} dry</span>}
+              </div>
             </div>
           )}
 
@@ -376,7 +531,7 @@ function SheepRow({ sheep: s, area }) {
 
 /* ── Groups page ───────────────────────────────────────────────── */
 export default function Groups() {
-  const { sheep, areas, groups, addGroup, deleteGroup, assignGroupToArea } = useFarm()
+  const { sheep, areas, groups, pregnancyScans, feedlotEntries, addGroup, deleteGroup, assignGroupToArea, addFeedlotEntry, updateFeedlotEntry } = useFarm()
   const { t } = useLanguage()
 
   const [showCreate, setShowCreate] = useState(false)
@@ -435,10 +590,14 @@ export default function Groups() {
               group={g}
               sheep={sheep}
               areas={areas}
+              pregnancyScans={pregnancyScans}
+              feedlotEntries={feedlotEntries}
               selected={selectedId === g.id}
               onSelect={setSelectedId}
               onDelete={deleteGroup}
               onAssignArea={assignGroupToArea}
+              onAddFeedlotEntry={addFeedlotEntry}
+              onUpdateFeedlotEntry={updateFeedlotEntry}
             />
           ))}
         </div>
