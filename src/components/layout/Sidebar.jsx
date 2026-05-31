@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Tag, MapPin, Baby, HeartPulse,
-  Heart, ShoppingCart, CheckSquare, BarChart3, Settings, X, Plus,
+  Heart, ShoppingCart, CheckSquare, BarChart3, Settings, X, Plus, Layers2,
 } from 'lucide-react'
 import { useUser }     from '../../context/UserContext'
 import { useLanguage } from '../../context/LanguageContext'
@@ -11,6 +11,7 @@ import FarmLogo        from '../ui/FarmLogo'
 const MAIN_NAV = [
   { to: '/',         key: 'nav.dashboard', icon: LayoutDashboard },
   { to: '/sheep',    key: 'nav.sheep',     icon: Tag             },
+  { to: '/groups',   key: 'nav.groups',    icon: Layers2         },
   { to: '/areas',    key: 'nav.areas',     icon: MapPin          },
   { to: '/births',   key: 'nav.births',    icon: Baby            },
   { to: '/health',   key: 'nav.health',    icon: HeartPulse      },

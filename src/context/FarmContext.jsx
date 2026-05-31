@@ -9,6 +9,7 @@ export function FarmProvider({ children }) {
 
   const [sheep,           setSheep]           = useState([])
   const [areas,           setAreas]           = useState([])
+  const [groups,          setGroups]          = useState([])
   const [births,          setBirths]          = useState([])
   const [healthRecords,   setHealthRecords]   = useState([])
   const [breedingRecords, setBreedingRecords] = useState([])
@@ -21,7 +22,7 @@ export function FarmProvider({ children }) {
   /* ── load all farm data when active farm changes ─────────── */
   const loadFarmData = useCallback(async (farmId) => {
     if (!farmId) {
-      setSheep([]); setAreas([]); setBirths([])
+      setSheep([]); setAreas([]); setGroups([]); setBirths([])
       setHealthRecords([]); setBreedingRecords([])
       setTransactions([]); setTasks([]); setDeaths([])
       return
@@ -30,6 +31,7 @@ export function FarmProvider({ children }) {
     const [
       { data: sheepRows },
       { data: areaRows },
+      { data: groupRows },
       { data: birthRows },
       { data: healthRows },
       { data: breedingRows },
@@ -39,6 +41,7 @@ export function FarmProvider({ children }) {
     ] = await Promise.all([
       supabase.from('sheep').select('*').eq('farm_id', farmId).order('tag_number'),
       supabase.from('areas').select('*').eq('farm_id', farmId).order('name'),
+      supabase.from('groups').select('*').eq('farm_id', farmId).order('created_at', { ascending: false }),
       supabase.from('births').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
       supabase.from('health_records').select('*').eq('farm_id', farmId).order('date', { ascending: false }),
       supabase.from('breeding_records').select('*').eq('farm_id', farmId).order('mating_date', { ascending: false }),
@@ -48,6 +51,7 @@ export function FarmProvider({ children }) {
     ])
     setSheep(mapRows(sheepRows))
     setAreas(mapRows(areaRows))
+    setGroups(mapRows(groupRows))
     setBirths(mapRows(birthRows))
     setHealthRecords(mapRows(healthRows))
     setBreedingRecords(mapRows(breedingRows))
@@ -121,6 +125,61 @@ export function FarmProvider({ children }) {
     await supabase.from('areas').delete().eq('id', id)
     setAreas(prev => prev.filter(a => a.id !== id))
     showToast('Area deleted')
+  }
+
+  /* ── groups CRUD ─────────────────────────────────────────── */
+  async function addGroup(groupData, count, sharedFields) {
+    const { data: group, error } = await supabase
+      .from('groups')
+      .insert(toDb({ ...groupData, farmId: activeFarmId }))
+      .select().single()
+    if (error) { showToast('Failed to create group', 'error'); return null }
+    const g = mapRow(group)
+    setGroups(prev => [g, ...prev])
+
+    // Bulk-insert sheep with placeholder tags
+    const prefix = groupData.name.replace(/\s+/g, '').slice(0, 3).toUpperCase()
+    const sheepRows = Array.from({ length: count }, (_, i) => toDb({
+      tagNumber:   `${prefix}-${String(i + 1).padStart(3, '0')}`,
+      farmId:      activeFarmId,
+      groupId:     g.id,
+      areaId:      sharedFields.areaId      || null,
+      sex:         sharedFields.sex         || 'lamb',
+      breed:       sharedFields.breed       || 'Merino',
+      status:      sharedFields.status      || 'healthy',
+      dateOfBirth: sharedFields.dateOfBirth || null,
+      weight:      sharedFields.weight ? parseFloat(sharedFields.weight) : null,
+      notes:       sharedFields.notes       || null,
+    }))
+    const { data: newSheep, error: sheepError } = await supabase
+      .from('sheep').insert(sheepRows).select()
+    if (sheepError) { showToast('Group created but some sheep failed to save', 'error'); return g }
+    setSheep(prev => [...mapRows(newSheep), ...prev])
+    showToast(`${groupData.name} created with ${count} sheep`)
+    return g
+  }
+
+  async function updateGroup(id, updates) {
+    const { data, error } = await supabase
+      .from('groups').update(toDb(updates)).eq('id', id).select().single()
+    if (error) { showToast('Failed to update group', 'error'); return }
+    setGroups(prev => prev.map(g => g.id === id ? mapRow(data) : g))
+    showToast('Group updated')
+  }
+
+  async function deleteGroup(id) {
+    await supabase.from('groups').delete().eq('id', id)
+    setGroups(prev => prev.filter(g => g.id !== id))
+    setSheep(prev => prev.map(s => s.groupId === id ? { ...s, groupId: null } : s))
+    showToast('Group deleted')
+  }
+
+  async function assignGroupToArea(groupId, areaId) {
+    await supabase.from('groups').update({ area_id: areaId }).eq('id', groupId)
+    await supabase.from('sheep').update({ area_id: areaId }).eq('group_id', groupId)
+    setGroups(prev => prev.map(g => g.id === groupId ? { ...g, areaId } : g))
+    setSheep(prev => prev.map(s => s.groupId === groupId ? { ...s, areaId } : s))
+    showToast('Group assigned to area')
   }
 
   /* ── births ───────────────────────────────────────────────── */
@@ -210,11 +269,12 @@ export function FarmProvider({ children }) {
 
   return (
     <FarmContext.Provider value={{
-      sheep, activeSheep, areas, births, healthRecords,
+      sheep, activeSheep, areas, groups, births, healthRecords,
       breedingRecords, transactions, tasks, deaths,
       weightHistory, stats, loading, toast,
       addSheep, updateSheep, deleteSheep,
       addArea, updateArea, deleteArea,
+      addGroup, updateGroup, deleteGroup, assignGroupToArea,
       addBirth,
       addHealthRecord,
       addBreedingRecord,

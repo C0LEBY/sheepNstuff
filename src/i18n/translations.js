@@ -11,6 +11,7 @@ const en = {
   'nav.reports':    'Reports',
   'nav.settings':   'Settings',
   'nav.farms':      'Farms & Groups',
+  'nav.groups':     'Groups',
 
   // ── Common actions ──────────────────────────────────────────
   'action.add':       'Add',
@@ -167,6 +168,7 @@ const af = {
   'nav.reports':    'Verslae',
   'nav.settings':   'Instellings',
   'nav.farms':      'Plase & Groepe',
+  'nav.groups':     'Groepe',
 
   // ── Algemene aksies ─────────────────────────────────────────
   'action.add':       'Voeg By',

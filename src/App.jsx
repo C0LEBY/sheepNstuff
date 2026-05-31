@@ -17,6 +17,7 @@ import Sales        from './pages/Sales'
 import Tasks        from './pages/Tasks'
 import Reports      from './pages/Reports'
 import Settings     from './pages/Settings'
+import Groups      from './pages/Groups'
 import Farms        from './pages/Farms'
 import Login        from './pages/auth/Login'
 import Register     from './pages/auth/Register'
@@ -66,6 +67,7 @@ export default function App() {
                       <Routes>
                         <Route path="/"          element={<Dashboard />} />
                         <Route path="/sheep"     element={<Sheep />} />
+                        <Route path="/groups"    element={<Groups />} />
                         <Route path="/sheep/:id" element={<SheepDetail />} />
                         <Route path="/areas"     element={<Areas />} />
                         <Route path="/births"    element={<Births />} />
