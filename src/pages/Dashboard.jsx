@@ -64,8 +64,10 @@ function StatPill({ label, value, accent, onClick }) {
     <button
       onClick={onClick}
       className={[
-        'flex-shrink-0 sm:flex-1 flex flex-col items-center px-4 pt-3.5 pb-3 rounded-2xl text-center hover:opacity-80 transition-opacity min-w-[72px]',
-        accent ? 'bg-farm-400' : 'bg-white dark:bg-[#2D2D2D]',
+        'flex-shrink-0 sm:flex-1 flex flex-col items-center px-4 pt-3.5 pb-3 rounded-2xl shadow-card text-center hover:shadow-card-hover transition-all min-w-[72px] border',
+        accent
+          ? 'bg-farm-400 border-farm-500'
+          : 'bg-white dark:bg-[#2D2D2D] border-cream-200 dark:border-stone-700',
       ].join(' ')}
     >
       <p className={`text-2xl font-bold leading-none ${accent ? 'text-white' : 'text-stone-900 dark:text-stone-100'}`}>{value}</p>
