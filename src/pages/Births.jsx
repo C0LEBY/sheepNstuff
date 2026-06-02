@@ -28,6 +28,7 @@ function AddBirthModal({ open, onClose }) {
     weaningDate: '',
     avgWeaningWeight: '',
   })
+  const [lambs, setLambs] = useState([])
 
   function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
 
@@ -37,7 +38,14 @@ function AddBirthModal({ open, onClose }) {
     else if (n === 2) set('type', 'twins')
     else if (n === 3) set('type', 'triplets')
     else if (n > 3) set('type', `${n} lambs`)
-  }, [form.lambCount])
+    // Sync per-lamb detail rows
+    const stillborns = parseInt(form.stillborns) || 0
+    const liveCount = Math.max(0, n - stillborns)
+    setLambs(prev => Array.from({ length: liveCount }, (_, i) => ({
+      sex:    prev[i]?.sex    || 'lamb',
+      weight: prev[i]?.weight || '',
+    })))
+  }, [form.lambCount, form.stillborns])
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -47,18 +55,20 @@ function AddBirthModal({ open, onClose }) {
 
     // Create lamb records for live births
     const lambIds = []
+    const mother = ewes.find(s => s.id === form.motherId)
+    const defaultAreaId = form.areaId || mother?.areaId || ''
     for (let i = 0; i < liveCount; i++) {
-      const mother = ewes.find(s => s.id === form.motherId)
+      const lambDetail = lambs[i] || {}
       const nextTag = `L-${String(Math.floor(Math.random() * 900) + 100)}`
       const newId = addSheep({
         tagNumber: nextTag,
         name: '',
-        sex: 'lamb',
-        breed: mother?.breed || 'Unknown',
+        sex:    lambDetail.sex    || 'lamb',
+        breed:  mother?.breed     || 'Unknown',
         dateOfBirth: form.date,
-        areaId: form.areaId || form.motherId && ewes.find(s => s.id === form.motherId)?.areaId || '',
+        areaId: defaultAreaId,
         status: 'healthy',
-        weight: 0,
+        weight: lambDetail.weight ? parseFloat(lambDetail.weight) : null,
         motherId: form.motherId,
         fatherId: form.fatherId,
         notes: '',
@@ -79,7 +89,7 @@ function AddBirthModal({ open, onClose }) {
       avgWeaningWeight: form.avgWeaningWeight ? parseFloat(form.avgWeaningWeight) : null,
     })
 
-    // Update mother status if was pregnant
+    setLambs([])
     onClose()
   }
 
@@ -118,7 +128,7 @@ function AddBirthModal({ open, onClose }) {
           <div>
             <label className={label}>Number of Lambs Born *</label>
             <input
-              required type="number" min="1" max="5"
+              required type="number" min="1" max="8"
               className={field} value={form.lambCount}
               onChange={e => set('lambCount', e.target.value)}
             />
@@ -137,6 +147,49 @@ function AddBirthModal({ open, onClose }) {
           <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-700">
             <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
             <span>{form.stillborns} stillborn lamb{parseInt(form.stillborns) > 1 ? 's' : ''} — this will be noted in the birth record.</span>
+          </div>
+        )}
+
+        {/* Per-lamb detail rows — shown for twins, triplets, etc. */}
+        {lambs.length > 1 && (
+          <div className="border border-cream-200 rounded-xl overflow-hidden">
+            <div className="px-4 py-2.5 bg-cream-50 border-b border-cream-200">
+              <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide">
+                Lamb Details — {form.type}
+              </p>
+            </div>
+            <div className="p-3 space-y-2">
+              {lambs.map((lamb, i) => (
+                <div key={i} className="grid grid-cols-[3rem_1fr_1fr] gap-2 items-center">
+                  <span className="text-xs font-semibold text-stone-400 text-center">#{i + 1}</span>
+                  <select
+                    className={field}
+                    value={lamb.sex}
+                    onChange={e => {
+                      const next = [...lambs]
+                      next[i] = { ...next[i], sex: e.target.value }
+                      setLambs(next)
+                    }}
+                  >
+                    <option value="lamb">Lamb (sex unknown)</option>
+                    <option value="ewe">Ewe</option>
+                    <option value="ram">Ram</option>
+                    <option value="wether">Wether</option>
+                  </select>
+                  <input
+                    type="number" step="0.1" min="0"
+                    placeholder="Birth weight kg"
+                    className={field}
+                    value={lamb.weight}
+                    onChange={e => {
+                      const next = [...lambs]
+                      next[i] = { ...next[i], weight: e.target.value }
+                      setLambs(next)
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
